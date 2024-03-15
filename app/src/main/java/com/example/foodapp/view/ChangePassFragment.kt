@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.foodapp.R
+import com.example.foodapp.base.BaseFragment
+import com.example.foodapp.databinding.FragmentChangePassBinding
 
-class ChangePassFragment : Fragment() {
+class ChangePassFragment : BaseFragment<FragmentChangePassBinding>() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,12 +17,11 @@ class ChangePassFragment : Fragment() {
 
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_change_pass, container, false)
+    override fun getLayout(container: ViewGroup?): FragmentChangePassBinding =
+        FragmentChangePassBinding.inflate(layoutInflater, container, false)
+
+    override fun initViews() {
+
     }
 
 
