@@ -1,4 +1,4 @@
-package com.example.foodapp.view
+package com.example.foodapp.view.log
 
 import android.os.Bundle
 import android.view.LayoutInflater

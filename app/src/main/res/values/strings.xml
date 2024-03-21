@@ -20,4 +20,10 @@
     <string name="or">OR</string>
     <string name="username">Tên người dùng</string>
     <string name="confirmpass">Nhập lại mật khẩu</string>
+    <string name="empty_email">Không được để trống email</string>
+    <string name="empty_name">Không được để trống tên người dùng</string>
+    <string name="valid_email">Hãy nhập đúng định dạng email</string>
+    <string name="empty_pass">Không được để trống mật khẩu</string>
+    <string name="length_pass">Mật khẩu có độ dài ít nhất 6 ký tự</string>
+    <string name="confirm_pass">Vui lòng nhập lại đúng mật khẩu</string>
 </resources>

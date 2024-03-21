@@ -1,11 +1,7 @@
-package com.example.foodapp.view
+package com.example.foodapp.view.log
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import com.example.foodapp.R
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentForgetPassBinding
 
