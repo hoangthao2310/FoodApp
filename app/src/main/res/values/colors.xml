@@ -5,4 +5,14 @@
     <color name="red_pink">#DE5A5A</color>
     <color name="grey_white">#F2F2F2</color>
     <color name="blue">#2C3FE3</color>
+    <color name="sliver">#C0C0C0</color>
+    <color name="grey">#808080</color>
+    <color name="yellow">#F3F730</color>
+    <color name="orange">#F78430</color>
+    <color name="pale_brown">#ECEEAD</color>
+    <color name="pale_blue">#51ECD0</color>
+    <color name="purple">#BF4865</color>
+    <color name="grey_white2">#EDEDE2</color>
+    <color name="brown">#C99C44</color>
+    <color name="pink">#FF7970</color>
 </resources>

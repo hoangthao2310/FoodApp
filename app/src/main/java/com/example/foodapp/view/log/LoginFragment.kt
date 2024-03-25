@@ -5,16 +5,18 @@ import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
-import com.example.foodapp.MainFragment
 import com.example.foodapp.R
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentLoginBinding
+import com.example.foodapp.until.PreferenceManager
+import com.example.foodapp.view.MainFragment
 import com.example.foodapp.viewmodel.LogViewModel
 
 
 class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
     private lateinit var logViewModel: LogViewModel
+    private lateinit var preferenceManager: PreferenceManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +27,20 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         FragmentLoginBinding.inflate(layoutInflater, container, false)
 
     override fun initViews() {
+
+//        preferenceManager = PreferenceManager(requireContext())
+//        val emailAdress = preferenceManager.getString("email")
+//        val pass = preferenceManager.getString("password")
+//        logViewModel.login(emailAdress!!, pass!!)
+//        logViewModel.getUserData.observe(viewLifecycleOwner){user ->
+//            logViewModel.getLogStatus.observe(this){
+//                if(it){
+//                    loading(false)
+//                    callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0, user)
+//                }
+//            }
+//        }
+
         binding.btnLogin.setOnClickListener {
             val email = binding.edtEmailAdress.text.toString()
             val password = binding.edtPassword.text.toString()
@@ -42,7 +58,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                     logViewModel.getLogStatus.observe(this){
                         if(it){
                             loading(false)
-                            callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0,userData)
+                            callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0, userData)
                         }
                     }
                 }

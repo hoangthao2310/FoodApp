@@ -50,7 +50,7 @@
                 android:gravity="center"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"
-                android:textColorHint="@color/black"
+                android:textColorHint="@color/grey"
                 android:textSize="20sp" />
 
             <EditText
@@ -65,7 +65,7 @@
                 android:gravity="center"
                 android:hint="@string/password"
                 android:inputType="textPassword"
-                android:textColorHint="@color/black"
+                android:textColorHint="@color/grey"
                 android:textSize="20sp" />
 
             <TextView

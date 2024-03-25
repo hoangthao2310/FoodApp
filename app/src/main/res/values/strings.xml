@@ -26,4 +26,14 @@
     <string name="empty_pass">Không được để trống mật khẩu</string>
     <string name="length_pass">Mật khẩu có độ dài ít nhất 6 ký tự</string>
     <string name="confirm_pass">Vui lòng nhập lại đúng mật khẩu</string>
+    <string name="hello">Xin chào</string>
+    <string name="menu">Thực đơn</string>
+    <string name="search">Tìm kiếm ...</string>
+    <string name="de_xuat_mon_an">Đề xuất cho bạn</string>
+    <string name="view_all">Xem tất cả</string>
+    <string name="choose_category">Chọn danh mục</string>
+    <string name="food_name">Food Name</string>
+    <string name="price">35.000đ</string>
+    <string name="plus">+</string>
+    <string name="name">name</string>
 </resources>

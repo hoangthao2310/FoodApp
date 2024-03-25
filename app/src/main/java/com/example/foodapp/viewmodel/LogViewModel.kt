@@ -33,4 +33,11 @@ class LogViewModel(application: Application) : AndroidViewModel(application) {
     fun login(email: String, password: String){
         logRepository.login(email, password)
     }
+    fun getUserDetail(userId: String){
+        logRepository.getUserDetail(userId)
+    }
+
+    fun logout(){
+        logRepository.logout()
+    }
 }
