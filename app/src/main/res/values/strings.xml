@@ -36,4 +36,5 @@
     <string name="price">35.000đ</string>
     <string name="plus">+</string>
     <string name="name">name</string>
+    <string name="rememberUser">Nhớ mật khẩu</string>
 </resources>

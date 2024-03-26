@@ -1,6 +1,7 @@
 package com.example.foodapp.view.log
 
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
@@ -28,19 +29,29 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
     override fun initViews() {
 
-//        preferenceManager = PreferenceManager(requireContext())
-//        val emailAdress = preferenceManager.getString("email")
-//        val pass = preferenceManager.getString("password")
-//        logViewModel.login(emailAdress!!, pass!!)
-//        logViewModel.getUserData.observe(viewLifecycleOwner){user ->
-//            logViewModel.getLogStatus.observe(this){
-//                if(it){
-//                    loading(false)
-//                    callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0, user)
-//                }
-//            }
-//        }
+        preferenceManager = PreferenceManager(requireContext())
+        val isRemember = preferenceManager.getBoolean("isRemember")
+        Log.d("LogPreferences", "isRemember: $isRemember")
 
+        if(isRemember){
+            val emailAdress = preferenceManager.getString("email")
+            val pass = preferenceManager.getString("password")
+            Log.d("LogPreferences", "Stored email: $emailAdress, Stored password: $pass")
+            if(!emailAdress.isNullOrEmpty() && !pass.isNullOrEmpty()) {
+                logViewModel.login(emailAdress, pass, true)
+                logViewModel.getUserData.observe(viewLifecycleOwner){userData ->
+                    logViewModel.getLogStatus.observe(this){
+                        if(it){
+                            loading(false)
+                            callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0, userData)
+                        }
+                    }
+                }
+            } else {
+                Log.e("LogPreferences", "Stored email or password is null or empty.")
+            }
+        }
+        
         binding.btnLogin.setOnClickListener {
             val email = binding.edtEmailAdress.text.toString()
             val password = binding.edtPassword.text.toString()
@@ -53,7 +64,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 binding.edtPassword.error = getString(R.string.empty_pass)
             }else{
                 loading(true)
-                logViewModel.login(email, password)
+                logViewModel.login(email, password, true)
                 logViewModel.getUserData.observe(viewLifecycleOwner){userData ->
                     logViewModel.getLogStatus.observe(this){
                         if(it){

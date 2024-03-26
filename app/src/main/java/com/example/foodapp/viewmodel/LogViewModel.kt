@@ -30,8 +30,8 @@ class LogViewModel(application: Application) : AndroidViewModel(application) {
         logRepository.register(email, password, name)
     }
 
-    fun login(email: String, password: String){
-        logRepository.login(email, password)
+    fun login(email: String, password: String, isRemember: Boolean){
+        logRepository.login(email, password, isRemember)
     }
     fun getUserDetail(userId: String){
         logRepository.getUserDetail(userId)

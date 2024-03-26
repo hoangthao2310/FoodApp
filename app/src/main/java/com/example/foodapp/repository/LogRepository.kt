@@ -70,16 +70,19 @@ class LogRepository (_application: Application){
         }
     }
 
-    fun login(email: String, password: String){
+    fun login(email: String, password: String, isRemember: Boolean){
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if(it.isSuccessful){
                 firebaseUser.postValue(auth.currentUser)
                 userLog.postValue(true)
                 Toast.makeText(application, "Đăng nhập thành công", Toast.LENGTH_LONG).show()
-//                auth.currentUser.let {
-//                    preferenceManager.putString("email", email)
-//                    preferenceManager.putString("password", password)
-//                }
+                if(isRemember){
+                    auth.currentUser.let {
+                        preferenceManager.putBoolean("isRemember", true)
+                        preferenceManager.putString("email", email)
+                        preferenceManager.putString("password", password)
+                    }
+                }
             }else{
                 userLog.postValue(false)
                 Toast.makeText(application, "Đăng nhập không thành công", Toast.LENGTH_SHORT).show()

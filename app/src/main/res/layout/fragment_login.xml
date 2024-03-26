@@ -53,6 +53,8 @@
                 android:textColorHint="@color/grey"
                 android:textSize="20sp" />
 
+
+
             <EditText
                 android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
@@ -67,6 +69,7 @@
                 android:inputType="textPassword"
                 android:textColorHint="@color/grey"
                 android:textSize="20sp" />
+
 
             <TextView
                 android:id="@+id/tvForgetPass"
