@@ -5,15 +5,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.foodapp.OnItemClickListener
-import com.example.foodapp.databinding.ItemFoodBinding
+import com.example.foodapp.databinding.ItemBestFoodBinding
 import com.example.foodapp.model.Food
 
-class FoodAdapter(
+class BestFoodAdapter(
     private var listFood: List<Food>,
     private val itemClick: OnItemClickListener
-) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>(){
-    inner class FoodViewHolder(private val binding: ItemFoodBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(food: Food){
+) : RecyclerView.Adapter<BestFoodAdapter.BestFoodViewHolder>() {
+    inner class BestFoodViewHolder(private val binding: ItemBestFoodBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(food: Food) {
             binding.tvFoodName.text = food.foodName
             binding.tvPrice.text = "${food.price}đ"
             binding.tvRating.text = food.rating.toString()
@@ -31,17 +32,17 @@ class FoodAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BestFoodViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = ItemFoodBinding.inflate(inflater, parent, false)
-        return FoodViewHolder(view)
+        val view = ItemBestFoodBinding.inflate(inflater, parent, false)
+        return BestFoodViewHolder(view)
     }
 
     override fun getItemCount(): Int {
         return listFood.size
     }
 
-    override fun onBindViewHolder(holder: FoodViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BestFoodViewHolder, position: Int) {
         holder.bind(listFood[position])
     }
 }

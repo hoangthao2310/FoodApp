@@ -1,6 +1,7 @@
 package com.example.foodapp.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.foodapp.model.User
@@ -35,6 +36,10 @@ class LogViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun getUserDetail(userId: String){
         logRepository.getUserDetail(userId)
+    }
+
+    fun updateProfileUser(userId: String, user: User, imageUri: Uri){
+        logRepository.updateProfileUser(userId, user, imageUri)
     }
 
     fun logout(){

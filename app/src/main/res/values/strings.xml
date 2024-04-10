@@ -22,6 +22,7 @@
     <string name="confirmpass">Nhập lại mật khẩu</string>
     <string name="empty_email">Không được để trống email</string>
     <string name="empty_name">Không được để trống tên người dùng</string>
+    <string name="empty_phone_number">Không được để trống số điện thoại</string>
     <string name="valid_email">Hãy nhập đúng định dạng email</string>
     <string name="empty_pass">Không được để trống mật khẩu</string>
     <string name="length_pass">Mật khẩu có độ dài ít nhất 6 ký tự</string>
@@ -37,4 +38,24 @@
     <string name="plus">+</string>
     <string name="name">name</string>
     <string name="rememberUser">Nhớ mật khẩu</string>
+    <string name="quantity">Số lượng: 2</string>
+    <string name="describe">Mô tả</string>
+    <string name="describeFood">Mô tả, giới thiệu về đồ ăn</string>
+    <string name="number">0</string>
+    <string name="addCart">Thêm vào giỏ hàng</string>
+    <string name="intoMoney">Thành tiền:</string>
+    <string name="rating">5.0 đánh giá</string>
+    <string name="cart">Giỏ hàng</string>
+    <string name="order">Đặt đơn hàng</string>
+    <string name="totalPrice">Tổng tiền:</string>
+    <string name="home">Trang chủ</string>
+    <string name="account">Tài khoản</string>
+    <string name="myProfile">Thông tin của tôi</string>
+    <string name="foodFavorite">Món ăn yêu thích</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="savedLocation">Địa điểm đã lưu</string>
+    <string name="payMethod">Phương thức thanh toán</string>
+    <string name="edit_profile">Chỉnh sửa thông tin cá nhân</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="save_change">Lưu thay đổi</string>
 </resources>

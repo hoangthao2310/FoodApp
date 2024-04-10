@@ -1,6 +1,7 @@
 package com.example.foodapp.repository
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
@@ -101,6 +102,30 @@ class LogRepository (_application: Application){
             .addOnFailureListener {
                 Log.d("getUserDetail", "Error getting user detail: $it")
             }
+    }
+
+    fun updateProfileUser(userId: String, user: User, imageUri: Uri){
+        storageReference.putFile(imageUri).addOnSuccessListener {
+            storageReference.downloadUrl.addOnSuccessListener { uri ->
+                val updateUser:HashMap<String, Any> = HashMap()
+                updateUser["userName"] = user.userName.toString()
+                updateUser["emailAdress"] = user.emailAdress.toString()
+                updateUser["phoneNumber"] = user.phoneNumber.toString()
+                updateUser["imageUser"] = uri.toString()
+                firestoreFirebase.collection("users").document(userId)
+                    .update(updateUser)
+                    .addOnCompleteListener {
+                        userLog.postValue(true)
+                        Toast.makeText(application, "cập nhật thành công", Toast.LENGTH_LONG).show()
+                    }
+                    .addOnFailureListener {
+                        userLog.postValue(false)
+                        Toast.makeText(application, "cập nhật không thành công", Toast.LENGTH_LONG).show()
+                    }
+            }
+        }
+
+
     }
     fun logout(){
         auth.signOut()
