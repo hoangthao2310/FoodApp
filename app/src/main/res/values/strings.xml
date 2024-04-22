@@ -58,4 +58,23 @@
     <string name="edit_profile">Chỉnh sửa thông tin cá nhân</string>
     <string name="phone_number">Số điện thoại</string>
     <string name="save_change">Lưu thay đổi</string>
+    <string name="location_order">Địa chỉ nhận hàng</string>
+    <string name="confirm_order">Xác nhận đặt đơn hàng</string>
+    <string name="express_delivery">Giao hỏa tốc: 20000.0đ</string>
+    <string name="fast_delivery">Giao hàng nhanh: 10000.0đ</string>
+    <string name="choose_payment">Chọn hình thức thanh toán</string>
+    <string name="cash">Tiền mặt</string>
+    <string name="elecwallet">Momo, zalopay, ...</string>
+    <string name="address_name">Tên địa chỉ</string>
+    <string name="address">Đia chỉ</string>
+    <string name="add_to_saved_location">Thêm vào địa điểm đã lưu</string>
+    <string name="edit_saved_location">Chỉnh sửa địa điểm đã lưu</string>
+    <string name="save">Lưu lại</string>
+    <string name="enter_address">Nhập địa chỉ</string>
+    <string name="select_address">Chọn địa chỉ</string>
+    <string name="delete_item">Bạn có muốn xóa không?</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
+    <string name="select_address_order">Chọn địa chỉ khác</string>
+    <string name="save_address">Lưu địa chỉ này</string>
 </resources>

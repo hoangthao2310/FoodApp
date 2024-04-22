@@ -17,13 +17,13 @@ import com.example.foodapp.view.food.FoodFragment
 import com.example.foodapp.view.profile.ProfileFragment
 import com.example.foodapp.viewmodel.CartViewModel
 import com.example.foodapp.viewmodel.FoodViewModel
-import com.example.foodapp.viewmodel.LogViewModel
+import com.example.foodapp.viewmodel.AccountViewModel
 import com.google.firebase.auth.FirebaseUser
 
 class MainFragment : BaseFragment<FragmentMainBinding>() {
     private lateinit var foodViewModel: FoodViewModel
     private lateinit var cartViewModel: CartViewModel
-    private lateinit var logViewModel: LogViewModel
+    private lateinit var accountViewModel: AccountViewModel
     private lateinit var bestFoodAdapter: BestFoodAdapter
     private lateinit var categoryAdapter: CategoryAdapter
     private lateinit var firebaseUser: FirebaseUser
@@ -31,10 +31,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         FragmentMainBinding.inflate(layoutInflater, container, false)
 
     override fun initViews() {
-        logViewModel = ViewModelProvider(this)[LogViewModel::class.java]
+        accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
         firebaseUser = data as FirebaseUser
-        logViewModel.getUserDetail(firebaseUser.uid)
-        logViewModel.getUser.observe(viewLifecycleOwner){it ->
+        accountViewModel.getUserDetail(firebaseUser.uid)
+        accountViewModel.getUser.observe(viewLifecycleOwner){
             binding.tvUserName.text = it.userName
         }
 
@@ -55,14 +55,20 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         callback.showFragment(MainFragment::class.java, FoodDetailFragment::class.java, 0, 0, food, true)
                     }
 
-                    override fun onItemAddCartClick(data: Any?) {
+                    override fun onItemAddClick(data: Any?) {
                         val food = data as Food
-                        cartViewModel.addCart(food, 1)
+                        cartViewModel.addCart(food, 1, food.price!!)
                         cartViewModel.isCheck.observe(viewLifecycleOwner){
                             if(it){
                                 notify("Đã thêm vào giỏ hàng")
                             }
                         }
+                    }
+
+                    override fun onItemEditClick(data: Any?) {
+                    }
+
+                    override fun onItemDeleteClick(data: Any?) {
                     }
                 }
                 bestFoodAdapter = BestFoodAdapter(listBestFood, onItemClickListener)
@@ -81,7 +87,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         callback.showFragment(MainFragment::class.java, FoodFragment::class.java, 0, 0, category, true)
                     }
 
-                    override fun onItemAddCartClick(data: Any?) {}
+                    override fun onItemAddClick(data: Any?) {}
+                    override fun onItemEditClick(data: Any?) {}
+                    override fun onItemDeleteClick(data: Any?) {}
                 }
                 categoryAdapter = CategoryAdapter(listCategory, onItemClickListener)
                 binding.rcvCategory.adapter = categoryAdapter
@@ -89,7 +97,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             }
         }
         binding.btnCart.setOnClickListener {
-            callback.showFragment(MainFragment::class.java, CartFragment::class.java, 0, 0, null, true)
+            callback.showFragment(MainFragment::class.java, CartFragment::class.java, 0, 0, firebaseUser, true)
         }
     }
 }

@@ -8,15 +8,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.foodapp.R
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentSignupBinding
-import com.example.foodapp.viewmodel.LogViewModel
+import com.example.foodapp.viewmodel.AccountViewModel
 
 class SignupFragment : BaseFragment<FragmentSignupBinding>() {
 
-    private lateinit var logViewModel: LogViewModel
+    private lateinit var accountViewModel: AccountViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logViewModel = ViewModelProvider(this)[LogViewModel::class.java]
+        accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
     }
     override fun getLayout(container: ViewGroup?): FragmentSignupBinding =
         FragmentSignupBinding.inflate(layoutInflater, container, false)
@@ -46,8 +46,8 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>() {
                 binding.edtConfirmPass.error = getString(R.string.confirm_pass)
             }else{
                 loading(true)
-                logViewModel.register(email, password, userName)
-                logViewModel.getLogStatus.observe(this){
+                accountViewModel.register(email, password, userName)
+                accountViewModel.getLogStatus.observe(this){
                     if(it){
                         loading(false)
                         callback.showFragment(SignupFragment::class.java, LoginFragment::class.java, 0,0)

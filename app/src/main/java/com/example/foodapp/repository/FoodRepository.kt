@@ -49,7 +49,6 @@ class FoodRepository(_application: Application) {
                         val categoryId = document.getString("categoryId")
                         val food = Food(foodId, foodName, price, rating, time, image, describe, bestFood, adminId, categoryId)
                         listFood.add(food)
-                        Log.d("bestFood", food.toString())
                     }
                     listFoodLiveData.postValue(listFood)
                 }
@@ -71,7 +70,6 @@ class FoodRepository(_application: Application) {
                         val image = document.getString("image")
                         val category = Category(categoryId, categoryName, image)
                         listCategory.add(category)
-                        Log.d("category", category.toString())
                     }
                     categoryLiveData.postValue(listCategory)
                 }
@@ -100,7 +98,6 @@ class FoodRepository(_application: Application) {
                         val categoryId = document.getString("categoryId")
                         val food = Food(foodId, foodName, price, rating, time, image, describe, bestFood, adminId, categoryId)
                         listFood.add(food)
-                        Log.d("food", food.toString())
                     }
                     listFoodLiveData.postValue(listFood)
                 }

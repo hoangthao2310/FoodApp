@@ -11,17 +11,17 @@ import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentLoginBinding
 import com.example.foodapp.until.PreferenceManager
 import com.example.foodapp.view.MainFragment
-import com.example.foodapp.viewmodel.LogViewModel
+import com.example.foodapp.viewmodel.AccountViewModel
 
 
 class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
-    private lateinit var logViewModel: LogViewModel
+    private lateinit var accountViewModel: AccountViewModel
     private lateinit var preferenceManager: PreferenceManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logViewModel = ViewModelProvider(this)[LogViewModel::class.java]
+        accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
     }
 
     override fun getLayout(container: ViewGroup?): FragmentLoginBinding =
@@ -38,9 +38,9 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
             val pass = preferenceManager.getString("password")
             Log.d("LogPreferences", "Stored email: $emailAdress, Stored password: $pass")
             if(!emailAdress.isNullOrEmpty() && !pass.isNullOrEmpty()) {
-                logViewModel.login(emailAdress, pass, true)
-                logViewModel.getUserData.observe(viewLifecycleOwner){userData ->
-                    logViewModel.getLogStatus.observe(this){
+                accountViewModel.login(emailAdress, pass, true)
+                accountViewModel.getUserData.observe(viewLifecycleOwner){userData ->
+                    accountViewModel.getLogStatus.observe(this){
                         if(it){
                             loading(false)
                             callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0, userData)
@@ -64,9 +64,9 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 binding.edtPassword.error = getString(R.string.empty_pass)
             }else{
                 loading(true)
-                logViewModel.login(email, password, true)
-                logViewModel.getUserData.observe(viewLifecycleOwner){userData ->
-                    logViewModel.getLogStatus.observe(this){
+                accountViewModel.login(email, password, true)
+                accountViewModel.getUserData.observe(viewLifecycleOwner){userData ->
+                    accountViewModel.getLogStatus.observe(this){
                         if(it){
                             loading(false)
                             callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0, userData)

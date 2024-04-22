@@ -26,7 +26,7 @@ class FoodAdapter(
                 itemClick.onItemClick(listFood[adapterPosition])
             }
             binding.btnAddFood.setOnClickListener {
-                itemClick.onItemAddCartClick(listFood[adapterPosition])
+                itemClick.onItemAddClick(listFood[adapterPosition])
             }
         }
     }

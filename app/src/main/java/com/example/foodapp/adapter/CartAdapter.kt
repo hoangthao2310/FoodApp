@@ -2,11 +2,13 @@ package com.example.foodapp.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.foodapp.OnItemCartClickListener
 import com.example.foodapp.databinding.ItemCartBinding
 import com.example.foodapp.model.Cart
+import com.example.foodapp.viewmodel.CartViewModel
 
 class CartAdapter(
     private var listCart: List<Cart>,
@@ -20,21 +22,20 @@ class CartAdapter(
             Glide.with(binding.root.context).load(cart.image).into(binding.imgItemCart)
 
             binding.btnIncreaseQuantity.setOnClickListener {
-                itemClick.onItemIncreaseClick(cart)
-                val quantity = cart.quantity + 1
-                cart.quantity = quantity
+                val quantity = binding.tvQuantity.text.toString().toInt() + 1
                 binding.tvQuantity.text = quantity.toString()
+                cart.quantity = quantity
+                itemClick.onItemIncreaseClick(listCart[adapterPosition])
             }
 
             binding.btnReduceQuantity.setOnClickListener {
-                itemClick.onItemReduceClick(cart)
-                val quantity = cart.quantity - 1
-                if (quantity >= 1) {
-                    cart.quantity = quantity
+                val quantity = binding.tvQuantity.text.toString().toInt() - 1
+                if(quantity>=1){
                     binding.tvQuantity.text = quantity.toString()
+                    cart.quantity = quantity
                 }
+                itemClick.onItemReduceClick(listCart[adapterPosition])
             }
-            binding.tvQuantity.text
         }
     }
 
@@ -51,4 +52,5 @@ class CartAdapter(
     override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
         holder.bind(listCart[position])
     }
+
 }

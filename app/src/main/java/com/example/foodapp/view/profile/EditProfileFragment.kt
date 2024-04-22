@@ -10,11 +10,11 @@ import com.bumptech.glide.Glide
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentEditProfileBinding
 import com.example.foodapp.model.User
-import com.example.foodapp.viewmodel.LogViewModel
+import com.example.foodapp.viewmodel.AccountViewModel
 import com.google.firebase.auth.FirebaseUser
 
 class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
-    private lateinit var logViewModel: LogViewModel
+    private lateinit var logViewModel: AccountViewModel
     private lateinit var firebaseUser: FirebaseUser
     private lateinit var imageUri: Uri
 
@@ -25,7 +25,7 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
         FragmentEditProfileBinding.inflate(layoutInflater, container, false)
 
     override fun initViews() {
-        logViewModel = ViewModelProvider(this)[LogViewModel::class.java]
+        logViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
         firebaseUser = data as FirebaseUser
         logViewModel.getUserDetail(firebaseUser.uid)
 
@@ -39,7 +39,6 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
             val userNew = User(
                 userName = binding.edtUserName.text.toString(),
                 emailAdress = binding.edtEmail.text.toString(),
-                phoneNumber = binding.edtPhoneNumber.text.toString()
             )
 
             loading(true)

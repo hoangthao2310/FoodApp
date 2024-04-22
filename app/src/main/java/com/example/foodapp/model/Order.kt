@@ -1,10 +1,10 @@
 package com.example.foodapp.model
 
-data class CartDetail(
-    val cartId: String?,
+data class Order(
     val foodId: String?,
+    val userName: String?,
     val phoneNumber: String?,
-    val totalAmount: Double?,
+    var totalPrice: Double?,
     val address: String?,
     val deliveryMethods: String?,
     val paymentMethods: String?

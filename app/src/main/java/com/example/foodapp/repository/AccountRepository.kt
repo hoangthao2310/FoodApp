@@ -1,10 +1,12 @@
 package com.example.foodapp.repository
 
 import android.app.Application
+import android.content.ContentValues
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import com.example.foodapp.model.Location
 import com.example.foodapp.model.User
 import com.example.foodapp.until.PreferenceManager
 import com.google.firebase.auth.FirebaseAuth
@@ -13,10 +15,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
-class LogRepository (_application: Application){
+class AccountRepository (_application: Application){
     private var firebaseUser: MutableLiveData<FirebaseUser>
     private var userLiveData: MutableLiveData<User>
+    private var locationLiveData: MutableLiveData<ArrayList<Location>>
     private var userLog: MutableLiveData<Boolean>
+    private var checkLocation: MutableLiveData<Boolean>
 
     private var application: Application
     private var auth:FirebaseAuth
@@ -30,14 +34,21 @@ class LogRepository (_application: Application){
 
     val getUser: MutableLiveData<User>
         get() = userLiveData
+    val getUserLocation: MutableLiveData<ArrayList<Location>>
+        get() = locationLiveData
 
     val isCheckLog: MutableLiveData<Boolean>
         get() = userLog
+
+    val isCheckLocation: MutableLiveData<Boolean>
+        get() = checkLocation
     init {
         application = _application
         firebaseUser = MutableLiveData<FirebaseUser>()
         userLiveData = MutableLiveData<User>()
+        locationLiveData = MutableLiveData<ArrayList<Location>>()
         userLog = MutableLiveData<Boolean>(false)
+        checkLocation = MutableLiveData<Boolean>(false)
 
         auth = FirebaseAuth.getInstance()
         if(auth.currentUser != null){
@@ -53,7 +64,7 @@ class LogRepository (_application: Application){
             if(it.isSuccessful){
                 firebaseUser.postValue(auth.currentUser)
                 userLog.postValue(true)
-                val user = User(name, "", email, password, defaultImage)
+                val user = User(name, email, password, defaultImage)
                 firestoreFirebase.collection("users").document(auth.uid!!)
                     .set(user)
                     .addOnCompleteListener {
@@ -110,7 +121,6 @@ class LogRepository (_application: Application){
                 val updateUser:HashMap<String, Any> = HashMap()
                 updateUser["userName"] = user.userName.toString()
                 updateUser["emailAdress"] = user.emailAdress.toString()
-                updateUser["phoneNumber"] = user.phoneNumber.toString()
                 updateUser["imageUser"] = uri.toString()
                 firestoreFirebase.collection("users").document(userId)
                     .update(updateUser)
@@ -124,9 +134,80 @@ class LogRepository (_application: Application){
                     }
             }
         }
-
-
     }
+
+    fun addLocation(addressName: String, address: String, note: String, contactPersonName: String, contactPhoneNumber: String){
+        val newLocation: HashMap<String, Any> = HashMap()
+        newLocation["addressName"] = addressName
+        newLocation["address"] = address
+        newLocation["note"] = note
+        newLocation["contactPersonName"] = contactPersonName
+        newLocation["contactPhoneNumber"] = contactPhoneNumber
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("location")
+            .add(newLocation)
+            .addOnSuccessListener { documentReference ->
+                checkLocation.postValue(true)
+                Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener {e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
+    fun getLocation(){
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("location")
+            .get()
+            .addOnCompleteListener {task ->
+                if(task.isSuccessful && task.result!=null){
+                    val listLocation = ArrayList<Location>()
+                    for(document in task.result){
+                        val locationId = document.id
+                        val addressName = document.getString("addressName")
+                        val address = document.getString("address")
+                        val note = document.getString("note")
+                        val contactPersonName = document.getString("contactPersonName")
+                        val contactPhoneNumber = document.getString("contactPhoneNumber")
+                        val location = Location(locationId, addressName, address, note, contactPersonName, contactPhoneNumber)
+                        listLocation.add(location)
+                    }
+                    locationLiveData.postValue(listLocation)
+                }
+            }
+            .addOnFailureListener {
+                Log.d("getLocation", "Error getting location: $it")
+            }
+    }
+
+    fun updateLocation(locationId: String, location: Location){
+        val newLocation: HashMap<String, Any> = HashMap()
+        newLocation["addressName"] = location.addressName.toString()
+        newLocation["address"] = location.address.toString()
+        newLocation["note"] = location.note.toString()
+        newLocation["contactPersonName"] = location.contactPersonName.toString()
+        newLocation["contactPhoneNumber"] = location.contactPhoneNumber.toString()
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
+            .collection("location").document(locationId)
+            .update(newLocation)
+            .addOnSuccessListener {
+                checkLocation.postValue(true)
+                Log.d(ContentValues.TAG, "Location updated successfully!")
+            }
+            .addOnFailureListener {e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
+    fun deleteLocation(locationId: String){
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("location").document(locationId)
+            .delete()
+            .addOnCompleteListener {
+                Log.d("Delete Location", "DocumentSnapshot successfully deleted!")
+                Toast.makeText(application, "Xóa thành công", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener {
+            }
+    }
+
     fun logout(){
         auth.signOut()
         preferenceManager.clear()

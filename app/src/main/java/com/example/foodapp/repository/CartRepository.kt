@@ -11,7 +11,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class CartRepository(_application: Application) {
     private var cartLiveData: MutableLiveData<ArrayList<Cart>>
-    private var checkAddCart: MutableLiveData<Boolean>
+    private var checkAddFirebase: MutableLiveData<Boolean>
+    private var totalPriceLiveData: MutableLiveData<Double>
 
     private val application: Application
     private val firebaseFirestore: FirebaseFirestore
@@ -20,25 +21,30 @@ class CartRepository(_application: Application) {
     val getCartFirebase: MutableLiveData<ArrayList<Cart>>
         get() = cartLiveData
     val isCheckAddCart: MutableLiveData<Boolean>
-        get() = checkAddCart
+        get() = checkAddFirebase
+    val totalPriceCart: MutableLiveData<Double>
+        get() = totalPriceLiveData
     init {
         application = _application
         firebaseFirestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
-        checkAddCart = MutableLiveData<Boolean>(false)
+        checkAddFirebase = MutableLiveData<Boolean>(false)
+        totalPriceLiveData = MutableLiveData<Double>()
         cartLiveData = MutableLiveData<ArrayList<Cart>>()
     }
 
-    fun addCart(food: Food, quantity: Int){
+    fun addCart(food: Food, quantity: Int, intoMoney: Double){
         val cart:HashMap<String, Any> = HashMap()
+        cart["foodId"] = food.foodId.toString()
         cart["foodName"] = food.foodName.toString()
         cart["price"] = food.price!!.toDouble()
         cart["image"] = food.image.toString()
         cart["quantity"] = quantity
+        cart["intoMoney"] = intoMoney
         firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
             .collection("cart").add(cart)
             .addOnSuccessListener { documentReference ->
-                checkAddCart.postValue(true)
+                checkAddFirebase.postValue(true)
                 Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
             }
             .addOnFailureListener {e ->
@@ -58,7 +64,8 @@ class CartRepository(_application: Application) {
                         val price = document.getDouble("price")
                         val image = document.getString("image")
                         val quantity = document.getLong("quantity")!!.toInt()
-                        val cart = Cart(foodId, foodName, price, quantity, image)
+                        val intoMoney = document.getDouble("intoMoney")
+                        val cart = Cart(foodId, foodName, price, quantity, image, intoMoney)
                         listFoodCart.add(cart)
                     }
                     cartLiveData.postValue(listFoodCart)
@@ -69,15 +76,50 @@ class CartRepository(_application: Application) {
             }
     }
 
-    fun updateQuantity(cart: Cart, inputQuantity: Int){
+    fun updateQuantity(cart: Cart){
+        val updateCart:HashMap<String, Any> = HashMap()
+        updateCart["quantity"] = cart.quantity!!
+        updateCart["intoMoney"] = cart.quantity!! * cart.price!!
         firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
             .collection("cart").document(cart.foodId.toString())
-            .set(inputQuantity)
+            .update(updateCart)
             .addOnSuccessListener {
                 Log.d("Edit", "Quantity updated successfully!")
             }
             .addOnFailureListener {
                 Log.e("Edit", "Quantity updating error", it)
+            }
+    }
+
+    fun totalPrice(){
+        var sum = 0.0
+        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
+            .collection("cart")
+            .get()
+            .addOnCompleteListener {
+                if(it.isSuccessful && it.result != null){
+                    for(document in it.result){
+                        val intoMoney = document.getDouble("intoMoney")
+                        if (intoMoney != null) {
+                            sum += intoMoney
+                        }
+                        totalPriceLiveData.postValue(sum)
+                    }
+                }
+            }
+    }
+
+    fun order(totalPrice: Double){
+        val order:HashMap<String, Any> = HashMap()
+        order["totalPrice"] = totalPrice
+        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
+            .collection("order").add(order)
+            .addOnSuccessListener { documentReference ->
+                checkAddFirebase.postValue(true)
+                Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener {e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
             }
     }
 }

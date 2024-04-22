@@ -38,14 +38,20 @@ class FoodFragment : BaseFragment<FragmentFoodBinding>() {
                         callback.showFragment(FoodFragment::class.java, FoodDetailFragment::class.java, 0, 0, food, true)
                     }
 
-                    override fun onItemAddCartClick(data: Any?) {
+                    override fun onItemAddClick(data: Any?) {
                         val food = data as Food
-                        cartViewModel.addCart(food, 1)
+                        cartViewModel.addCart(food, 1, food.price!!)
                         cartViewModel.isCheck.observe(viewLifecycleOwner){
                             if(it){
                                 notify("Đã thêm vào giỏ hàng")
                             }
                         }
+                    }
+
+                    override fun onItemEditClick(data: Any?) {
+                    }
+
+                    override fun onItemDeleteClick(data: Any?) {
                     }
 
                 }
