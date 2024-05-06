@@ -1,4 +1,4 @@
-package com.example.foodapp.view.profile
+package com.example.foodapp.view.profileUser
 
 import android.content.Intent
 import android.net.Uri
@@ -47,7 +47,7 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
                 logViewModel.getLogStatus.observe(this){
                     if(it){
                         loading(false)
-                        callback.showFragment(EditProfileFragment::class.java, ProfileFragment::class.java, 0,0, userData)
+                        callback.showFragment(EditProfileFragment::class.java, ProfileFragment::class.java, 0,0, userData, true)
                     }
                 }
             }

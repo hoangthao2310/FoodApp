@@ -1,4 +1,4 @@
-package com.example.foodapp.view.profile.location.dialog
+package com.example.foodapp.view.profileUser.location.dialog
 
 import android.view.ViewGroup
 import com.example.foodapp.base.BaseDialog

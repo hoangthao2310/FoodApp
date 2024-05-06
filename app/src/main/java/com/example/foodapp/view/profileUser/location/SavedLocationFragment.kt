@@ -1,4 +1,4 @@
-package com.example.foodapp.view.profile.location
+package com.example.foodapp.view.profileUser.location
 
 import android.view.View
 import android.view.ViewGroup
@@ -8,9 +8,8 @@ import com.example.foodapp.adapter.LocationAdapter
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentSavedLocationBinding
 import com.example.foodapp.model.Location
-import com.example.foodapp.view.cart.OrderFragment
-import com.example.foodapp.view.profile.location.dialog.DeleteDialog
-import com.example.foodapp.view.profile.location.dialog.OnClickListener
+import com.example.foodapp.view.profileUser.location.dialog.DeleteDialog
+import com.example.foodapp.view.profileUser.location.dialog.OnClickListener
 import com.example.foodapp.viewmodel.AccountViewModel
 
 class SavedLocationFragment : BaseFragment<FragmentSavedLocationBinding>() {
@@ -57,7 +56,7 @@ class SavedLocationFragment : BaseFragment<FragmentSavedLocationBinding>() {
             }
         }
         binding.layoutAddAddress.setOnClickListener {
-            callback.showFragment(SavedLocationFragment::class.java, MapsFragment::class.java, 0, 0, data, true)
+            callback.showFragment(SavedLocationFragment::class.java, MapsFragment::class.java, 0, 0, data, false)
         }
 
         binding.btnBack.setOnClickListener {

@@ -1,14 +1,13 @@
-package com.example.foodapp.view.profile.location
+package com.example.foodapp.view.profileUser.location
 
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentEditToSavedLocationBinding
 import com.example.foodapp.model.Location
-import com.example.foodapp.view.profile.location.dialog.DeleteDialog
-import com.example.foodapp.view.profile.location.dialog.OnClickListener
+import com.example.foodapp.view.profileUser.location.dialog.DeleteDialog
+import com.example.foodapp.view.profileUser.location.dialog.OnClickListener
 import com.example.foodapp.viewmodel.AccountViewModel
 
 class EditToSavedLocationFragment : BaseFragment<FragmentEditToSavedLocationBinding>() {
@@ -46,6 +45,9 @@ class EditToSavedLocationFragment : BaseFragment<FragmentEditToSavedLocationBind
                 contactPhoneNumber = binding.edtPhoneNumber.text.toString()
             )
             loading(true)
+            if(binding.cbChooseDefault.isChecked){
+                accountViewModel.updateInfoUserOrder(newLocation)
+            }
             accountViewModel.updateLocation(location.locationId.toString(),newLocation)
             accountViewModel.getLocationStatus.observe(viewLifecycleOwner){
                 if(it){
@@ -55,6 +57,8 @@ class EditToSavedLocationFragment : BaseFragment<FragmentEditToSavedLocationBind
                         SavedLocationFragment::class.java,
                         0,
                         0,
+                        null,
+                        false
                     )
                     notify("Lưu thay đổi thành công")
                 }

@@ -1,6 +1,5 @@
 package com.example.foodapp.view.food
 
-import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
@@ -40,10 +39,17 @@ class FoodFragment : BaseFragment<FragmentFoodBinding>() {
 
                     override fun onItemAddClick(data: Any?) {
                         val food = data as Food
-                        cartViewModel.addCart(food, 1, food.price!!)
-                        cartViewModel.isCheck.observe(viewLifecycleOwner){
-                            if(it){
-                                notify("Đã thêm vào giỏ hàng")
+                        cartViewModel.getCart(food.adminId.toString())
+                        cartViewModel.getCartFirebase.observe(viewLifecycleOwner){listItemCart->
+                            if(!listItemCart.contains(listItemCart.find { it.foodId == food.foodId })){
+                                cartViewModel.addCart(food, 1, food.price!!)
+                                cartViewModel.isCheck.observe(viewLifecycleOwner){
+                                    if(it){
+                                        notify("Đã thêm vào giỏ hàng")
+                                    }
+                                }
+                            }else{
+                                notify("Đã có trong giỏ hàng")
                             }
                         }
                     }

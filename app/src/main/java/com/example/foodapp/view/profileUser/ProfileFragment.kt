@@ -1,12 +1,13 @@
-package com.example.foodapp.view.profile
+package com.example.foodapp.view.profileUser
 
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentProfileBinding
-import com.example.foodapp.view.MainFragment
-import com.example.foodapp.view.profile.location.SavedLocationFragment
+import com.example.foodapp.view.home.HomeUserFragment
+import com.example.foodapp.view.log.LoginFragment
+import com.example.foodapp.view.profileUser.location.SavedLocationFragment
 import com.example.foodapp.viewmodel.AccountViewModel
 import com.google.firebase.auth.FirebaseUser
 
@@ -30,17 +31,22 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             callback.showFragment(ProfileFragment::class.java, EditProfileFragment::class.java, 0, 0, data, true)
         }
 
+        binding.btnFavouriteFood.setOnClickListener {
+            callback.showFragment(ProfileFragment::class.java, FavouriteFoodFragment::class.java, 0, 0, data, true)
+        }
+
         binding.btnLocation.setOnClickListener {
             callback.showFragment(ProfileFragment::class.java, SavedLocationFragment::class.java, 0,0, data, true)
         }
 
         binding.btnHome.setOnClickListener {
-            callback.showFragment(ProfileFragment::class.java, MainFragment::class.java, 0, 0, data)
+            callback.showFragment(ProfileFragment::class.java, HomeUserFragment::class.java, 0, 0, data, true)
         }
 
 
         binding.btnLogout.setOnClickListener {
             accountViewModel.logout()
+            callback.showFragment(ProfileFragment::class.java, LoginFragment::class.java, 0, 0, null, false)
         }
     }
 

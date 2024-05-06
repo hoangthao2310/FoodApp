@@ -112,6 +112,7 @@
                     android:text="@string/select_address_order"
                     android:textSize="16sp"
                     android:textStyle="bold"
+                    android:visibility="invisible"
                     android:layout_marginEnd="8dp"
                     android:layout_marginTop="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -165,31 +166,33 @@
                 android:layout_marginTop="4dp"
                 android:background="@drawable/order_background">
 
-
-                <CheckBox
-                    android:id="@+id/cbFastDelivery"
-                    android:layout_width="wrap_content"
+                <RadioGroup
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/fast_delivery"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <CheckBox
-                    android:id="@+id/cbExpressDelivery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/express_delivery"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
+                    android:layout_marginStart="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cbFastDelivery" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RadioButton
+                        android:id="@+id/radFastDelivery"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fast_delivery"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+
+                    <RadioButton
+                        android:id="@+id/radExpressDelivery"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/express_delivery" />
+                </RadioGroup>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
@@ -278,7 +281,7 @@
                     android:id="@+id/tvTotalFood"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/price"
+                    android:text=""
                     android:textSize="16sp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginTop="8dp"
@@ -289,7 +292,7 @@
                     android:id="@+id/tvTransportFee"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10000.0đ"
+                    android:text="0đ"
                     android:textSize="16sp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginTop="8dp"
@@ -311,7 +314,7 @@
                     android:id="@+id/tvTotalOrder"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/price"
+                    android:text=""
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginEnd="16dp"
@@ -339,31 +342,33 @@
                 android:layout_marginTop="4dp"
                 android:background="@drawable/order_background">
 
-
-                <CheckBox
-                    android:id="@+id/cbCash"
-                    android:layout_width="wrap_content"
+                <RadioGroup
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/cash"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <CheckBox
-                    android:id="@+id/cbElecWallet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/elecwallet"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
+                    android:layout_marginStart="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cbCash" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RadioButton
+                        android:id="@+id/radCash"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cash"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+
+                    <RadioButton
+                        android:id="@+id/radElecWallet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/elecwallet"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+                </RadioGroup>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
@@ -378,23 +383,39 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnConfirmOrder"
-            style="@android:style/Widget.Button"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_background"
-            android:text="@string/confirm_order"
-            android:textColor="@color/white"
-            android:layout_marginBottom="16dp"
-            android:layout_marginStart="16dp"
+            android:animateLayoutChanges="true"
             android:layout_marginEnd="16dp"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnConfirmOrder"
+                style="@android:style/Widget.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_background"
+                android:text="@string/confirm_order"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <ProgressBar
+                android:id="@+id/proBarBtnOrder"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:visibility="invisible"/>
+        </FrameLayout>
 
         <TextView
             android:id="@+id/textView10"
@@ -411,7 +432,7 @@
             android:id="@+id/tvTotalPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0đ"
+            android:text=""
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_marginEnd="16dp"

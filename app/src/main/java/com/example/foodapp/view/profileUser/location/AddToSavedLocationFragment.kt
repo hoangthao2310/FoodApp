@@ -1,4 +1,4 @@
-package com.example.foodapp.view.profile.location
+package com.example.foodapp.view.profileUser.location
 
 import android.location.Address
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentAddToSavedLocationBinding
+import com.example.foodapp.model.Location
 import com.example.foodapp.viewmodel.AccountViewModel
 
 class AddToSavedLocationFragment : BaseFragment<FragmentAddToSavedLocationBinding>() {
@@ -21,17 +22,22 @@ class AddToSavedLocationFragment : BaseFragment<FragmentAddToSavedLocationBindin
         binding.edtAddress.setText(address[0].getAddressLine(0))
 
         binding.btnSaveLocation.setOnClickListener {
-            val addressName = binding.edtAddressName.text.toString()
-            val add = binding.edtAddress.text.toString()
-            val note = binding.edtNote.text.toString()
-            val contactPersonName = binding.edtContactPersonName.text.toString()
-            val contactPhoneNumber = binding.edtPhoneNumber.text.toString()
+            val newLocation = Location(
+                addressName = binding.edtAddressName.text.toString(),
+                address = binding.edtAddress.text.toString(),
+                note = binding.edtNote.text.toString(),
+                contactPersonName = binding.edtContactPersonName.text.toString(),
+                contactPhoneNumber = binding.edtPhoneNumber.text.toString()
+            )
             loading(true)
-            accountViewModel.addLocation(addressName, add, note, contactPersonName, contactPhoneNumber)
+            if(binding.cbChooseDefault.isChecked){
+                accountViewModel.updateInfoUserOrder(newLocation)
+            }
+            accountViewModel.addLocation(newLocation)
             accountViewModel.getLocationStatus.observe(viewLifecycleOwner){
                 if(it){
                     loading(false)
-                    callback.showFragment(AddToSavedLocationFragment::class.java, SavedLocationFragment::class.java, 0, 0)
+                    callback.showFragment(AddToSavedLocationFragment::class.java, SavedLocationFragment::class.java, 0, 0, null, false)
                     notify("Lưu địa chỉ thành công")
                 }
             }

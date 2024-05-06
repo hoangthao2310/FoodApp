@@ -10,7 +10,8 @@ import com.example.foodapp.R
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentLoginBinding
 import com.example.foodapp.until.PreferenceManager
-import com.example.foodapp.view.MainFragment
+import com.example.foodapp.view.home.HomeAdminFragment
+import com.example.foodapp.view.home.HomeUserFragment
 import com.example.foodapp.viewmodel.AccountViewModel
 
 
@@ -42,8 +43,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 accountViewModel.getUserData.observe(viewLifecycleOwner){userData ->
                     accountViewModel.getLogStatus.observe(this){
                         if(it){
-                            loading(false)
-                            callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0, userData)
+                            accountViewModel.checkAdmin()
+                            accountViewModel.getLogAdminStatus.observe(viewLifecycleOwner){isCheck ->
+                                if(isCheck){
+                                    loading(false)
+                                    callback.showFragment(LoginFragment::class.java, HomeAdminFragment::class.java, 0,0, userData, false)
+                                }else{
+                                    loading(false)
+                                    callback.showFragment(LoginFragment::class.java, HomeUserFragment::class.java, 0,0, userData, false)
+                                }
+                            }
                         }
                     }
                 }
@@ -68,8 +77,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 accountViewModel.getUserData.observe(viewLifecycleOwner){userData ->
                     accountViewModel.getLogStatus.observe(this){
                         if(it){
-                            loading(false)
-                            callback.showFragment(LoginFragment::class.java, MainFragment::class.java, 0,0, userData)
+                            accountViewModel.checkAdmin()
+                            accountViewModel.getLogAdminStatus.observe(viewLifecycleOwner){isCheck ->
+                                if(isCheck){
+                                    loading(false)
+                                    callback.showFragment(LoginFragment::class.java, HomeAdminFragment::class.java, 0,0, userData, false)
+                                }else{
+                                    loading(false)
+                                    callback.showFragment(LoginFragment::class.java, HomeUserFragment::class.java, 0,0, userData, false)
+                                }
+                            }
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 package com.example.foodapp.model
 
 data class Cart(
+    val cartId: String?,
     val foodId: String?,
     val foodName: String?,
     val price: Double?,

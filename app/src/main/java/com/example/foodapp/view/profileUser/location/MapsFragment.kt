@@ -1,4 +1,4 @@
-package com.example.foodapp.view.profile.location
+package com.example.foodapp.view.profileUser.location
 
 import android.content.pm.PackageManager
 import android.location.Address
@@ -47,7 +47,6 @@ class MapsFragment : BaseFragment<FragmentMapsBinding>(), OnMapReadyCallback, Lo
     private val permissionCode = 101
 
     private lateinit var accountViewModel: AccountViewModel
-    private lateinit var addressUser: com.example.foodapp.model.Location
     override fun getLayout(container: ViewGroup?): FragmentMapsBinding =
         FragmentMapsBinding.inflate(layoutInflater, container, false)
 

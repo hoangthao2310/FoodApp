@@ -1,25 +1,31 @@
 package com.example.foodapp.view.food
 
+import android.annotation.SuppressLint
+import android.util.Log
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentFoodDetailBinding
 import com.example.foodapp.model.Food
+import com.example.foodapp.viewmodel.AccountViewModel
 import com.example.foodapp.viewmodel.CartViewModel
 import com.example.foodapp.viewmodel.FoodViewModel
 
 class FoodDetailFragment : BaseFragment<FragmentFoodDetailBinding>() {
     private lateinit var foodViewModel: FoodViewModel
     private lateinit var cartViewModel: CartViewModel
+    private lateinit var accountViewModel: AccountViewModel
     private lateinit var food: Food
     override fun getLayout(container: ViewGroup?): FragmentFoodDetailBinding =
         FragmentFoodDetailBinding.inflate(layoutInflater, container, false)
 
+    @SuppressLint("SetTextI18n")
     override fun initViews() {
         foodViewModel = ViewModelProvider(this)[FoodViewModel::class.java]
         food = data as Food
         foodViewModel.foodDetail(food.foodId.toString())
+        Log.d("favourToDetail", food.toString())
 
         foodViewModel.getFoodDetail.observe(viewLifecycleOwner){food ->
             binding.tvFoodName.text = food.foodName
@@ -49,12 +55,24 @@ class FoodDetailFragment : BaseFragment<FragmentFoodDetailBinding>() {
 
         cartViewModel = ViewModelProvider(this)[CartViewModel::class.java]
         binding.btnAddToCart.setOnClickListener {
-            cartViewModel.addCart(food, binding.tvQuantity.text.toString().toInt(), binding.tvIntoMoney.text.toString().toDouble())
-            cartViewModel.isCheck.observe(viewLifecycleOwner){
-                if(it){
-                    notify("Đã thêm vào giỏ hàng")
+            cartViewModel.getCart(food.adminId.toString())
+            cartViewModel.getCartFirebase.observe(viewLifecycleOwner){listItemCart->
+                if(!listItemCart.contains(listItemCart.find { it.foodId == food.foodId })){
+                    cartViewModel.addCart(food, binding.tvQuantity.text.toString().toInt(), binding.tvIntoMoney.text.toString().toDouble())
+                    cartViewModel.isCheck.observe(viewLifecycleOwner){
+                        if(it){
+                            notify("Đã thêm vào giỏ hàng")
+                        }
+                    }
+                }else{
+                    notify("Đã có trong giỏ hàng")
                 }
             }
+        }
+
+        accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
+        binding.btnFavouriteFood.setOnClickListener {
+            accountViewModel.addFavouriteFood(food)
         }
 
         binding.btnBack.setOnClickListener {

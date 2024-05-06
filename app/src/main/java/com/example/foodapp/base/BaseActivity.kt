@@ -1,6 +1,7 @@
 package com.example.foodapp.base
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
@@ -40,6 +41,7 @@ abstract class BaseActivity<VM: ViewBinding> : AppCompatActivity(), OnActionCall
         }
         trans.setCustomAnimations(enterAnim, exitAnim)
         trans.replace(R.id.fr_main, fragment, toFragment.name)
+        Log.d("fragment", toFragment.name)
         trans.commit()
     }
 

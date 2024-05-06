@@ -1,7 +1,10 @@
 package com.example.foodapp.adapter
 
+import android.database.DataSetObserver
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.SpinnerAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.foodapp.OnItemClickListener
@@ -12,7 +15,7 @@ import com.example.foodapp.model.Category
 class CategoryAdapter(
     private var listCategory: List<Category>,
     private val itemClick: OnItemClickListener
-) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>(){
+) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     inner class CategoryViewHolder(private var binding: ItemCategoryBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(category: Category, position: Int){

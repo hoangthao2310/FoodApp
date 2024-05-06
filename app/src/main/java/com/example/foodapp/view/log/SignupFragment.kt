@@ -46,7 +46,7 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>() {
                 binding.edtConfirmPass.error = getString(R.string.confirm_pass)
             }else{
                 loading(true)
-                accountViewModel.register(email, password, userName)
+                accountViewModel.register(email, password, userName, false)
                 accountViewModel.getLogStatus.observe(this){
                     if(it){
                         loading(false)

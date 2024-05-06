@@ -10,5 +10,6 @@ data class Food(
     val describe: String? = null,
     val bestFood: Boolean? = null,
     val adminId: String? = null,
-    val categoryId: String? = null
+    val categoryId: String? = null,
+    val favouriteId: String? = null
 )

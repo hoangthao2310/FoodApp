@@ -31,62 +31,71 @@
                 android:gravity="center"
                 android:textSize="36sp"/>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="150dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="15dp"
-                android:layout_alignParentBottom="true"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvQuestionDelete"
                 android:layout_alignParentStart="true"
-                android:layout_marginBottom="36dp"
-                app:cardCornerRadius="20dp"
-                android:id="@+id/btnYes">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/red_pink"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/yes"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="150dp"
-                android:layout_height="50dp"
-                android:layout_marginRight="15dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="36dp"
-                app:cardCornerRadius="20dp"
-                android:id="@+id/btnNo">
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/red_pink"
-                    android:gravity="center">
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnYes"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    app:cardCornerRadius="20dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/no"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/red_pink"
+                        android:gravity="center">
 
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/yes"
+                            android:textColor="@color/white"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
 
-            </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnNo"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    app:cardCornerRadius="20dp"
+                    android:layout_weight="1">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/red_pink"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/no"
+                            android:textColor="@color/white"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+
         </RelativeLayout>
 
     </com.google.android.material.card.MaterialCardView>

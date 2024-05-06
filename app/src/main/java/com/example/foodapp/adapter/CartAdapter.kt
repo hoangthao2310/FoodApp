@@ -1,5 +1,6 @@
 package com.example.foodapp.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +16,7 @@ class CartAdapter(
     private val itemClick: OnItemCartClickListener
 ) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
     inner class CartViewHolder(private val binding: ItemCartBinding): RecyclerView.ViewHolder(binding.root){
+        @SuppressLint("SetTextI18n")
         fun bind(cart: Cart) {
             binding.tvNameItem.text = cart.foodName
             binding.tvPriceItem.text = "${cart.price}đ"

@@ -6,6 +6,8 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import com.example.foodapp.model.FavouriteFood
+import com.example.foodapp.model.Food
 import com.example.foodapp.model.Location
 import com.example.foodapp.model.User
 import com.example.foodapp.until.PreferenceManager
@@ -20,7 +22,10 @@ class AccountRepository (_application: Application){
     private var userLiveData: MutableLiveData<User>
     private var locationLiveData: MutableLiveData<ArrayList<Location>>
     private var userLog: MutableLiveData<Boolean>
+    private var adminLog: MutableLiveData<Boolean>
     private var checkLocation: MutableLiveData<Boolean>
+    private var favouriteFoodLiveData: MutableLiveData<ArrayList<Food>>
+    private var infoAdmin: MutableLiveData<String>
 
     private var application: Application
     private var auth:FirebaseAuth
@@ -42,6 +47,12 @@ class AccountRepository (_application: Application){
 
     val isCheckLocation: MutableLiveData<Boolean>
         get() = checkLocation
+    val getCheckAdmin: MutableLiveData<Boolean>
+        get() = adminLog
+    val getFavouriteFood: MutableLiveData<ArrayList<Food>>
+        get() = favouriteFoodLiveData
+    val getInfoAdmin: MutableLiveData<String>
+        get() = infoAdmin
     init {
         application = _application
         firebaseUser = MutableLiveData<FirebaseUser>()
@@ -49,6 +60,9 @@ class AccountRepository (_application: Application){
         locationLiveData = MutableLiveData<ArrayList<Location>>()
         userLog = MutableLiveData<Boolean>(false)
         checkLocation = MutableLiveData<Boolean>(false)
+        adminLog = MutableLiveData<Boolean>()
+        favouriteFoodLiveData = MutableLiveData<ArrayList<Food>>()
+        infoAdmin = MutableLiveData<String>()
 
         auth = FirebaseAuth.getInstance()
         if(auth.currentUser != null){
@@ -59,12 +73,12 @@ class AccountRepository (_application: Application){
         preferenceManager = PreferenceManager(application)
     }
 
-    fun register(email: String, password: String, name: String){
+    fun register(email: String, password: String, name: String, checkAdmin: Boolean){
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { it ->
             if(it.isSuccessful){
                 firebaseUser.postValue(auth.currentUser)
                 userLog.postValue(true)
-                val user = User(name, email, password, defaultImage)
+                val user = User(name, email, password, defaultImage, checkAdmin)
                 firestoreFirebase.collection("users").document(auth.uid!!)
                     .set(user)
                     .addOnCompleteListener {
@@ -101,6 +115,7 @@ class AccountRepository (_application: Application){
             }
         }
     }
+
     fun getUserDetail(userID: String){
         firestoreFirebase.collection("users").document(userID)
             .get()
@@ -136,13 +151,31 @@ class AccountRepository (_application: Application){
         }
     }
 
-    fun addLocation(addressName: String, address: String, note: String, contactPersonName: String, contactPhoneNumber: String){
+    fun updateInfoUserOrder(location: Location){
         val newLocation: HashMap<String, Any> = HashMap()
-        newLocation["addressName"] = addressName
-        newLocation["address"] = address
-        newLocation["note"] = note
-        newLocation["contactPersonName"] = contactPersonName
-        newLocation["contactPhoneNumber"] = contactPhoneNumber
+        newLocation["address"] = location.address.toString()
+        newLocation["note"] = location.note.toString()
+        newLocation["contactPersonName"] = location.contactPersonName.toString()
+        newLocation["contactPhoneNumber"] = location.contactPhoneNumber.toString()
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
+            .update(newLocation)
+            .addOnSuccessListener {
+                checkLocation.postValue(true)
+                Log.d(ContentValues.TAG, "Location updated successfully!")
+            }
+            .addOnFailureListener {e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
+
+    fun addLocation(location: Location){
+        val newLocation: HashMap<String, Any> = HashMap()
+        newLocation["addressName"] = location.addressName.toString()
+        newLocation["address"] = location.address.toString()
+        newLocation["note"] = location.note.toString()
+        newLocation["contactPersonName"] = location.contactPersonName.toString()
+        newLocation["contactPhoneNumber"] = location.contactPhoneNumber.toString()
         firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("location")
             .add(newLocation)
             .addOnSuccessListener { documentReference ->
@@ -167,7 +200,14 @@ class AccountRepository (_application: Application){
                         val note = document.getString("note")
                         val contactPersonName = document.getString("contactPersonName")
                         val contactPhoneNumber = document.getString("contactPhoneNumber")
-                        val location = Location(locationId, addressName, address, note, contactPersonName, contactPhoneNumber)
+                        val location = Location(
+                            locationId,
+                            addressName,
+                            address,
+                            note,
+                            contactPersonName,
+                            contactPhoneNumber
+                        )
                         listLocation.add(location)
                     }
                     locationLiveData.postValue(listLocation)
@@ -211,5 +251,105 @@ class AccountRepository (_application: Application){
     fun logout(){
         auth.signOut()
         preferenceManager.clear()
+    }
+
+    fun checkAdmin(){
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
+            .get()
+            .addOnCompleteListener { task ->
+                val isCheck = task.result.getBoolean("checkAdmin")
+                adminLog.postValue(isCheck!!)
+            }
+            .addOnFailureListener {
+                Log.d("checkAdmin", it.toString())
+            }
+    }
+
+    fun addFavouriteFood(food: Food){
+        val favourite = HashMap<String, Any>()
+        favourite["foodId"] = food.foodId.toString()
+        favourite["foodName"] = food.foodName.toString()
+        favourite["price"] = food.price!!.toDouble()
+        favourite["rating"] = food.rating!!.toDouble()
+        favourite["time"] = food.time.toString()
+        favourite["image"] = food.image.toString()
+        favourite["describe"] = food.describe.toString()
+        favourite["bestFood"] = food.bestFood!!
+        favourite["adminId"] = food.adminId.toString()
+        favourite["categoryId"] = food.categoryId.toString()
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
+            .collection("favouriteFood")
+            .add(favourite)
+            .addOnSuccessListener {
+                Toast.makeText(application, "Đã thêm món ăn vào mục yêu thích", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(application, "Thêm món ăn vào mục yêu thích thất bại", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    fun getFavouriteFood(){
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("favouriteFood")
+            .get()
+            .addOnCompleteListener { task ->
+                if(task.isSuccessful && task.result != null){
+                    val list = ArrayList<Food>()
+                    for(document in task.result){
+                        val favouriteId = document.id
+                        val foodId = document.getString("foodId")
+                        val foodName = document.getString("foodName")
+                        val price = document.getDouble("price")
+                        val time = document.getString("time")
+                        val rating = document.getDouble("rating")
+                        val image = document.getString("image")
+                        val describe = document.getString("describe")
+                        val bestFood = document.getBoolean("bestFood")
+                        val adminId = document.getString("adminId")
+                        val categoryId = document.getString("categoryId")
+                        val food = Food(
+                            foodId,
+                            foodName,
+                            price,
+                            rating,
+                            time,
+                            image,
+                            describe,
+                            bestFood,
+                            adminId,
+                            categoryId,
+                            favouriteId
+                        )
+                        list.add(food)
+                    }
+                    favouriteFoodLiveData.postValue(list)
+                }
+            }
+            .addOnFailureListener {
+                Log.d("getFavouriteFood", "Error getting favourite food: $it")
+            }
+    }
+
+    fun deleteFavouriteFood(favouriteId: String){
+        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
+            .collection("favouriteFood").document(favouriteId)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("deleteFavouriteFood", "DocumentSnapshot successfully deleted!")
+                Toast.makeText(application, "Xóa thành công", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener{
+                Toast.makeText(application, "Xóa không thành công", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    fun getInfoAdmin(adminId: String){
+        firestoreFirebase.collection("users").document(adminId)
+            .get()
+            .addOnSuccessListener {
+                infoAdmin.postValue(it.getString("userName"))
+            }
+            .addOnFailureListener {
+                Log.d("getInfoAdmin", "Fail ,${it}")
+            }
     }
 }
