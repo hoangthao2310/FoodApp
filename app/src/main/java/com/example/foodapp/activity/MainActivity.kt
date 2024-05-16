@@ -4,6 +4,7 @@ import android.os.Bundle
 import com.example.foodapp.R
 import com.example.foodapp.base.BaseActivity
 import com.example.foodapp.databinding.ActivityMainBinding
+import com.example.foodapp.view.home.HomeUserFragment
 import com.example.foodapp.view.log.LoginFragment
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
@@ -16,4 +17,5 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun getLayout(): ActivityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+
 }

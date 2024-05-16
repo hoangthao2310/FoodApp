@@ -43,15 +43,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 accountViewModel.getUserData.observe(viewLifecycleOwner){userData ->
                     accountViewModel.getLogStatus.observe(this){
                         if(it){
-                            accountViewModel.checkAdmin()
-                            accountViewModel.getLogAdminStatus.observe(viewLifecycleOwner){isCheck ->
-                                if(isCheck){
+                            accountViewModel.getUserDetail()
+                            accountViewModel.getUser.observe(viewLifecycleOwner){ user ->
+                                if(user?.checkAdmin == true){
                                     loading(false)
-                                    callback.showFragment(LoginFragment::class.java, HomeAdminFragment::class.java, 0,0, userData, false)
+                                    callback.showFragment(LoginFragment::class.java, HomeAdminFragment::class.java, 0,0, userData, true)
                                 }else{
                                     loading(false)
-                                    callback.showFragment(LoginFragment::class.java, HomeUserFragment::class.java, 0,0, userData, false)
+                                    callback.showFragment(LoginFragment::class.java, HomeUserFragment::class.java, 0,0, userData, true)
                                 }
+
                             }
                         }
                     }
@@ -77,15 +78,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 accountViewModel.getUserData.observe(viewLifecycleOwner){userData ->
                     accountViewModel.getLogStatus.observe(this){
                         if(it){
-                            accountViewModel.checkAdmin()
-                            accountViewModel.getLogAdminStatus.observe(viewLifecycleOwner){isCheck ->
-                                if(isCheck){
+                            accountViewModel.getUserDetail()
+                            accountViewModel.getUser.observe(viewLifecycleOwner){ user ->
+                                if(user?.checkAdmin == true){
                                     loading(false)
-                                    callback.showFragment(LoginFragment::class.java, HomeAdminFragment::class.java, 0,0, userData, false)
+                                    callback.showFragment(LoginFragment::class.java, HomeAdminFragment::class.java, 0,0, userData, true)
                                 }else{
                                     loading(false)
-                                    callback.showFragment(LoginFragment::class.java, HomeUserFragment::class.java, 0,0, userData, false)
+                                    callback.showFragment(LoginFragment::class.java, HomeUserFragment::class.java, 0,0, userData, true)
                                 }
+
                             }
                         }
                     }

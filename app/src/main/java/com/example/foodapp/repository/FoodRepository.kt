@@ -1,316 +1,195 @@
 package com.example.foodapp.repository
 
 import android.app.Application
+import android.content.ContentValues
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.example.foodapp.model.Category
 import com.example.foodapp.model.Food
-import com.example.foodapp.until.PreferenceManager
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.util.UUID
+import kotlin.random.Random
 
 class FoodRepository(_application: Application) {
     private var listFoodLiveData: MutableLiveData<ArrayList<Food>>
-    private var foodLivedata: MutableLiveData<Food>
-    private var category: MutableLiveData<ArrayList<String>>
-    private var categoryDetail: MutableLiveData<String>
     private var categoryLiveData: MutableLiveData<ArrayList<Category>>
-    private var check: MutableLiveData<Boolean>
     private var application: Application
 
-    private val firebaseFirestore: FirebaseFirestore
     private val storageReference: StorageReference
+    private var database: FirebaseDatabase
 
     val getFoodFirebase: MutableLiveData<ArrayList<Food>>
         get() = listFoodLiveData
-    val getFoodDetail: MutableLiveData<Food>
-        get() = foodLivedata
     val getCategoryFirebase: MutableLiveData<ArrayList<Category>>
         get() = categoryLiveData
-    val getCategory: MutableLiveData<ArrayList<String>>
-        get() = category
-    val getCheck: MutableLiveData<Boolean>
-        get() = check
-    val getCateDetail: MutableLiveData<String>
-        get() = categoryDetail
     init {
         application = _application
         listFoodLiveData = MutableLiveData<ArrayList<Food>>()
-        foodLivedata = MutableLiveData<Food>()
         categoryLiveData = MutableLiveData<ArrayList<Category>>()
-        category = MutableLiveData<ArrayList<String>>()
-        check = MutableLiveData<Boolean>(false)
-        categoryDetail = MutableLiveData<String>()
 
-        firebaseFirestore = FirebaseFirestore.getInstance()
         storageReference = FirebaseStorage.getInstance().reference
+        database = FirebaseDatabase.getInstance()
     }
 
     fun bestFood(){
-        firebaseFirestore.collection("food").whereEqualTo("bestFood", true)
-            .get()
-            .addOnCompleteListener { task ->
-                if(task.isSuccessful && task.result != null){
-                    val listFood = ArrayList<Food>()
-                    for(document in task.result){
-                        val foodId = document.id
-                        val foodName = document.getString("foodName")
-                        val price = document.getDouble("price")
-                        val time = document.getString("time")
-                        val rating = document.getDouble("rating")
-                        val image = document.getString("image")
-                        val describe = document.getString("describe")
-                        val bestFood = document.getBoolean("bestFood")
-                        val adminId = document.getString("adminId")
-                        val categoryId = document.getString("categoryId")
-                        val food = Food(
-                            foodId,
-                            foodName,
-                            price,
-                            rating,
-                            time,
-                            image,
-                            describe,
-                            bestFood,
-                            adminId,
-                            categoryId
-                        )
-                        listFood.add(food)
-                    }
-                    listFoodLiveData.postValue(listFood)
-                }
-            }
-            .addOnFailureListener {
-                Log.d("getBestFood", "Error getting best food: $it")
-            }
-    }
-
-    fun category(){
-        firebaseFirestore.collection("category")
-            .get()
-            .addOnCompleteListener { task ->
-                if(task.isSuccessful && task.result != null){
-                    val listCategory = ArrayList<Category>()
-                    for(document in task.result){
-                        val categoryId = document.id
-                        val categoryName = document.getString("categoryName")
-                        val image = document.getString("image")
-                        val category =
-                            Category(categoryId, categoryName, image)
-                        listCategory.add(category)
-                    }
-                    categoryLiveData.postValue(listCategory)
-                }
-            }
-            .addOnFailureListener {
-                Log.d("getCategory", "Error getting category: $it")
-            }
-    }
-    fun categoryName(){
-        firebaseFirestore.collection("category")
-            .get()
-            .addOnCompleteListener {
-                if(it.isSuccessful && it.result != null){
-                    val list = ArrayList<String>()
-                    for(document in it.result){
-                        val categoryName = document.getString("categoryName")
-                        list.add(categoryName.toString())
-                    }
-                    category.postValue(list)
-                }
-            }
-
-    }
-
-    fun food(cateId: String?){
-        firebaseFirestore.collection("food").whereEqualTo("categoryId", cateId)
-            .get()
-            .addOnCompleteListener { task ->
-                if(task.isSuccessful && task.result != null){
-                    val listFood = ArrayList<Food>()
-                    for(document in task.result){
-                        val foodId = document.id
-                        val foodName = document.getString("foodName")
-                        val price = document.getDouble("price")
-                        val time = document.getString("time")
-                        val rating = document.getDouble("rating")
-                        val image = document.getString("image")
-                        val describe = document.getString("describe")
-                        val bestFood = document.getBoolean("bestFood")
-                        val adminId = document.getString("adminId")
-                        val categoryId = document.getString("categoryId")
-                        val food = Food(
-                            foodId,
-                            foodName,
-                            price,
-                            rating,
-                            time,
-                            image,
-                            describe,
-                            bestFood,
-                            adminId,
-                            categoryId
-                        )
-                        listFood.add(food)
-                    }
-                    listFoodLiveData.postValue(listFood)
-                }
-            }
-            .addOnFailureListener {
-                Log.d("getFood", "Error getting food: $it")
-            }
-    }
-
-    fun foodDetail(foodId: String?){
-        if (foodId != null) {
-            firebaseFirestore.collection("food").document(foodId)
-                .get()
-                .addOnSuccessListener {
-                    if(it.exists()){
-                        val food = it.toObject(Food::class.java)
-                        foodLivedata.postValue(food!!)
-                    }
-                }
-                .addOnFailureListener {
-                    Log.d("getFoodDetail", "Error getting food detail: $it")
-                }
-        }
-    }
-
-    fun foodAdmin(id: String){
-        firebaseFirestore.collection("food").whereEqualTo("adminId", id)
-            .get()
-            .addOnCompleteListener {task ->
-                if(task.isSuccessful && task.result != null){
+        database.getReference("Foods").orderByChild("bestFood").equalTo(true)
+            .addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
                     val list = ArrayList<Food>()
-                    for(document in task.result){
-                        val foodId = document.id
-                        val foodName = document.getString("foodName")
-                        val price = document.getDouble("price")
-                        val time = document.getString("time")
-                        val rating = document.getDouble("rating")
-                        val image = document.getString("image")
-                        val describe = document.getString("describe")
-                        val bestFood = document.getBoolean("bestFood")
-                        val adminId = document.getString("adminId")
-                        val categoryId = document.getString("categoryId")
-                        val food = Food(
-                            foodId,
-                            foodName,
-                            price,
-                            rating,
-                            time,
-                            image,
-                            describe,
-                            bestFood,
-                            adminId,
-                            categoryId)
-                        list.add(food)
+                    for(itemSnap in snapshot.children){
+                        val food = itemSnap.getValue(Food::class.java)
+                        if (food != null) {
+                            list.add(food)
+                        }
                     }
                     listFoodLiveData.postValue(list)
                 }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(ContentValues.TAG, "Failed to read best food.", error.toException())
+                }
+
+            })
+    }
+
+    fun category(){
+        database.getReference("Category").addValueEventListener(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val list = ArrayList<Category>()
+                for(snap in snapshot.children){
+                    val category = snap.getValue(Category::class.java)
+                    if (category != null) {
+                        list.add(category)
+                    }
+                }
+                categoryLiveData.postValue(list)
+                Log.d("category", list.toString())
             }
-            .addOnFailureListener {
-                Log.d("getFood", "Error getting food: $it")
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("category", "Failed to read value.", error.toException())
             }
+
+        })
+    }
+
+    fun food(cateId: String?){
+        database.getReference("Foods").orderByChild("categoryId").equalTo(cateId)
+            .addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val list = ArrayList<Food>()
+                for(snap in snapshot.children){
+                    val food = snap.getValue(Food::class.java)
+                    if (food != null) {
+                        list.add(food)
+                    }
+                }
+                listFoodLiveData.postValue(list)
+                Log.d("Food", list.toString())
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("Food", "Failed to read value.", error.toException())
+            }
+
+        })
+    }
+
+    fun foodAdmin(id: String){
+        database.getReference("Foods").orderByChild("adminId").equalTo(id)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = ArrayList<Food>()
+                    for(snap in snapshot.children){
+                        val food = snap.getValue(Food::class.java)
+                        if (food != null) {
+                            list.add(food)
+                        }
+                    }
+                    listFoodLiveData.postValue(list)
+                    Log.d("Food Admin", list.toString())
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("Food Admin", "Failed to read value.", error.toException())
+                }
+
+            })
     }
 
     fun deleteFoodAdmin(foodId: String){
-        firebaseFirestore.collection("food").document(foodId)
-            .delete()
-            .addOnSuccessListener {
+        database.getReference("Foods").child(foodId)
+            .removeValue()
+            .addOnCompleteListener {
+                Log.d("deleteFoodAdmin", "DocumentSnapshot successfully deleted!")
                 Toast.makeText(application, "Xóa thành công", Toast.LENGTH_LONG).show()
             }
-            .addOnFailureListener{
+            .addOnFailureListener {
                 Toast.makeText(application, "Xóa không thành công", Toast.LENGTH_LONG).show()
             }
     }
 
-    fun addFood(food: Food, image: Uri){
+    fun addFood(food: Food, image: Uri?){
+        val id = Random.nextInt(100000)
         val reference = storageReference.child("food_image/" + UUID.randomUUID().toString())
-        reference.putFile(image).addOnSuccessListener {
-            reference.downloadUrl.addOnSuccessListener { uri ->
-                val newFood = HashMap<String, Any>()
-                newFood["foodName"] = food.foodName.toString()
-                newFood["price"] = food.price!!.toDouble()
-                newFood["rating"] = food.rating!!.toDouble()
-                newFood["time"] = food.time.toString()
-                newFood["image"] = uri.toString()
-                newFood["describe"] = food.describe.toString()
-                newFood["bestFood"] = food.bestFood!!
-                newFood["adminId"] = food.adminId.toString()
-                newFood["categoryId"] = food.categoryId.toString()
-                firebaseFirestore.collection("food")
-                    .add(newFood)
-                    .addOnSuccessListener {
-                        check.postValue(true)
-                        Log.d("addFood", "Success")
-                    }
-                    .addOnFailureListener {
-                        Log.d("addFood", "Fail")
-                    }
+        if (image != null) {
+            reference.putFile(image).addOnSuccessListener {
+                reference.downloadUrl.addOnSuccessListener { uri ->
+                    val newFood = HashMap<String, Any>()
+                    newFood["foodId"] = id.toString()
+                    newFood["foodName"] = food.foodName.toString()
+                    newFood["price"] = food.price!!.toDouble()
+                    newFood["rating"] = food.rating!!.toDouble()
+                    newFood["time"] = food.time.toString()
+                    newFood["image"] = uri.toString()
+                    newFood["describe"] = food.describe.toString()
+                    newFood["bestFood"] = food.bestFood!!
+                    newFood["adminId"] = food.adminId.toString()
+                    newFood["categoryId"] = food.categoryId.toString()
+                    database.getReference("Foods").child(id.toString())
+                        .setValue(newFood)
+                        .addOnSuccessListener {
+                            Log.d("addFood", "Success")
+                        }
+                        .addOnFailureListener {
+                            Log.d("addFood", "Fail")
+                        }
+                }
+            }.addOnFailureListener {
+                Log.d("upImage", "Fail")
             }
-        }.addOnFailureListener {
-            Log.d("upImage", "Fail")
         }
 
     }
 
-    fun getCategoryId(categoryName: String){
-        firebaseFirestore.collection("category").whereEqualTo("categoryName", categoryName)
-            .get()
-            .addOnCompleteListener {task ->
-                for(document in task.result){
-                    categoryDetail.postValue(document.id)
-                }
-            }
-    }
-    fun getCategoryName(categoryId: String){
-        firebaseFirestore.collection("category").whereEqualTo("categoryId", categoryId)
-            .get()
-            .addOnCompleteListener {task ->
-                for(document in task.result){
-                    categoryDetail.postValue(document.getString("categoryName"))
-                }
-            }
-    }
-    fun foodDetailAdmin(foodId: String){
-        firebaseFirestore.collection("food").document(foodId)
-            .get()
-            .addOnSuccessListener {
-                if(it.exists()){
-                    val food = it.toObject(Food::class.java)
-                    foodLivedata.postValue(food!!)
-                }
-            }
-            .addOnFailureListener {
-                Log.d("getFoodDetailAdmin", "Error getting food detail: $it")
-            }
-    }
-
-    fun updateImage(foodId: String, image: Uri){
+    fun updateImage(foodId: String, image: Uri?){
         val reference = storageReference.child("food_image/" + UUID.randomUUID().toString())
-        reference.putFile(image).addOnSuccessListener {
-            reference.downloadUrl.addOnSuccessListener { uri ->
-                firebaseFirestore.collection("food").document(foodId)
-                    .update("image", uri.toString())
-                    .addOnSuccessListener {
-                        Log.d("updateFood", "Success")
-                    }
-                    .addOnFailureListener {
-                        Log.d("updateFood", "Fail")
-                    }
+        if (image != null) {
+            reference.putFile(image).addOnSuccessListener {
+                reference.downloadUrl.addOnSuccessListener { uri ->
+                    database.getReference("Foods").child(foodId)
+                        .setValue("image", uri.toString())
+                        .addOnSuccessListener {
+                            Log.d("updateImageFood", "Success")
+                        }
+                        .addOnFailureListener {
+                            Log.d("updateImageFood", "Fail")
+                        }
+                }
+            }.addOnFailureListener {
+                Log.d("upImage", "Fail")
             }
-        }.addOnFailureListener {
-            Log.d("upImage", "Fail")
         }
     }
 
-    fun updateFoodAdmin(food: Food, foodId: String?){
+    fun updateFoodAdmin(food: Food, foodId: String){
         val newFood = HashMap<String, Any>()
         newFood["foodName"] = food.foodName.toString()
         newFood["price"] = food.price!!.toDouble()
@@ -318,10 +197,9 @@ class FoodRepository(_application: Application) {
         newFood["describe"] = food.describe.toString()
         newFood["bestFood"] = food.bestFood!!
         newFood["categoryId"] = food.categoryId.toString()
-        firebaseFirestore.collection("food").document(foodId.toString())
-            .update(newFood)
+        database.getReference("Foods").child(foodId)
+            .updateChildren(newFood)
             .addOnSuccessListener {
-                check.postValue(true)
                 Log.d("updateFood", "Success")
             }
             .addOnFailureListener {

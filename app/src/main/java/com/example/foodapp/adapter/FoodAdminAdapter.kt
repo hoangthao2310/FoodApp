@@ -9,12 +9,12 @@ import com.example.foodapp.OnItemClickListener
 import com.example.foodapp.databinding.ItemFavouriteFoodBinding
 import com.example.foodapp.model.Food
 
-class FavouriteFoodAdapter(
+class FoodAdminAdapter(
     var listFood: ArrayList<Food>,
     private val itemClick: OnItemClickListener
-): RecyclerView.Adapter<FavouriteFoodAdapter.FavouriteFoodViewHolder>() {
+): RecyclerView.Adapter<FoodAdminAdapter.FoodAdminViewHolder>() {
 
-    inner class FavouriteFoodViewHolder(private val binding: ItemFavouriteFoodBinding): RecyclerView.ViewHolder(binding.root){
+    inner class FoodAdminViewHolder(private val binding: ItemFavouriteFoodBinding): RecyclerView.ViewHolder(binding.root){
         @SuppressLint("SetTextI18n")
         fun bind(food: Food){
             binding.tvFoodName.text = food.foodName
@@ -36,17 +36,17 @@ class FavouriteFoodAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): FavouriteFoodAdapter.FavouriteFoodViewHolder {
+    ): FoodAdminAdapter.FoodAdminViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = ItemFavouriteFoodBinding.inflate(inflater, parent, false)
-        return FavouriteFoodViewHolder(view)
+        return FoodAdminViewHolder(view)
     }
 
     override fun onBindViewHolder(
-        holder: FavouriteFoodAdapter.FavouriteFoodViewHolder,
+        holder: FoodAdminAdapter.FoodAdminViewHolder,
         position: Int
     ) {
-        listFood[position]?.let { holder.bind(it) }
+        holder.bind(listFood[position])
     }
 
     override fun getItemCount(): Int {

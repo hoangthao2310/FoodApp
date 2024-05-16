@@ -1,6 +1,5 @@
 package com.example.foodapp.view.profileUser
 
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
@@ -29,7 +28,6 @@ class FavouriteFoodFragment : BaseFragment<FragmentFavouriteFoodBinding>() {
                     override fun onItemClick(data: Any?) {
                         val food = data as Food
                         callback.showFragment(FavouriteFoodFragment::class.java, FoodDetailFragment::class.java, 0, 0, food, true)
-                        Log.d("favour", food.toString())
                     }
 
                     override fun onItemAddClick(data: Any?) {}
@@ -41,7 +39,7 @@ class FavouriteFoodFragment : BaseFragment<FragmentFavouriteFoodBinding>() {
                             val food = data
                             val dialog = DeleteDialog(object: OnClickListener {
                                 override fun onClick() {
-                                    accountViewModel.deleteFavouriteFood(food.favouriteId.toString())
+                                    accountViewModel.deleteFavouriteFood(food.foodId.toString())
                                     val position = favouriteFoodAdapter.listFood.indexOf(food)
                                     favouriteFoodAdapter.removeItem(position)
                                 }

@@ -8,77 +8,74 @@ import com.example.foodapp.R
 import com.example.foodapp.adapter.OrderAdapter
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentOrderBinding
+import com.example.foodapp.model.CartAdmin
 import com.example.foodapp.model.Order
-import com.example.foodapp.view.home.HomeUserFragment
-import com.example.foodapp.view.cart.dialog.OrderSuccessDialog
-import com.example.foodapp.view.cart.dialog.OnClickListener
-import com.example.foodapp.viewmodel.CartViewModel
+import com.example.foodapp.view.purchaseOrder.PurchaseOrderFragment
 import com.example.foodapp.viewmodel.AccountViewModel
-import com.google.firebase.auth.FirebaseUser
+import com.example.foodapp.viewmodel.CartViewModel
 
 
 class OrderFragment : BaseFragment<FragmentOrderBinding>() {
     private lateinit var cartViewModel: CartViewModel
     private lateinit var accountViewModel: AccountViewModel
     private lateinit var orderAdapter: OrderAdapter
-    private lateinit var firebaseUser: FirebaseUser
+    private lateinit var cartAdmin: CartAdmin
 
     private var delivery: String? = null
     private var payment: String? = null
     private var total: Double? = null
-    private var describeOrder: String? = null
+    private var totalPrice: Double? = 0.0
+    private var describeOrder: String? = ""
     override fun getLayout(container: ViewGroup?): FragmentOrderBinding =
         FragmentOrderBinding.inflate(layoutInflater, container, false)
 
     @SuppressLint("SetTextI18n")
     override fun initViews() {
-        accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
-        firebaseUser = data as FirebaseUser
-        accountViewModel.getUserDetail(firebaseUser.uid)
-        accountViewModel.getUser.observe(viewLifecycleOwner){user ->
-            binding.tvUserName.text = user.contactPersonName
-            binding.tvPhoneNumber.text = user.contactPhoneNumber
-            binding.tvAddress.text = user.address
+        cartAdmin = data as CartAdmin
 
-            if(binding.tvAddress.text.isEmpty()){
-                binding.tvSelectAddressOrder.visibility = View.VISIBLE
-            }
+        accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
+        accountViewModel.getUserDetail()
+        accountViewModel.getUser.observe(viewLifecycleOwner){user ->
+            binding.tvUserName.text = user?.contactPersonName
+            binding.tvPhoneNumber.text = user?.contactPhoneNumber
+            binding.tvAddress.text = user?.address
+        }
+        binding.btnSelectAddressOrder.setOnClickListener {
+            callback.showFragment(OrderFragment::class.java, LocationOrderFragment::class.java, 0, 0, cartAdmin,true)
         }
 
         cartViewModel = ViewModelProvider(this)[CartViewModel::class.java]
-        //cartViewModel.getCart()
+        cartViewModel.getCartDetail(cartAdmin.adminId.toString())
         cartViewModel.getCartFirebase.observe(viewLifecycleOwner){
             orderAdapter = OrderAdapter(it)
             binding.rcvOrder.adapter = orderAdapter
             binding.proBarOrder.visibility = View.INVISIBLE
+
             for(cart in it){
-                describeOrder += cart.foodName + ": Giá: " + cart.price + ", Số lượng: " + cart.quantity + "\n"
+                describeOrder += cart.foodName + ": Giá: " + cart.price + ", Số lượng: " + cart.quantity + " "
+                totalPrice = totalPrice!! + cart.intoMoney!!
+            }
+            binding.tvTotalFood.text = totalPrice.toString() + "đ"
+            total = totalPrice!! + 10000.0
+            binding.tvTotalPrice.text = total.toString() + "đ"
+            binding.tvTotalOrder.text = total.toString() + "đ"
+        }
+
+        binding.radFastDelivery.setOnCheckedChangeListener{ _, isChecked ->
+            if (isChecked){
+                binding.tvTransportFee.text = "10000.0đ"
+                total = totalPrice!! + 10000.0 - 10000.0
+                binding.tvTotalPrice.text = total.toString() + "đ"
+                binding.tvTotalOrder.text = total.toString() + "đ"
             }
         }
 
-        //cartViewModel.totalPrice()
-        cartViewModel.totalPrice.observe(viewLifecycleOwner){
-            binding.tvTotalFood.text = it.toString() + "đ"
-            total = it + 10000.0
-            binding.tvTotalPrice.text = total.toString() + "đ"
-            binding.tvTotalOrder.text = total.toString() + "đ"
-
-            binding.radFastDelivery.setOnCheckedChangeListener{ _, isChecked ->
-                if (isChecked){
-                    binding.tvTransportFee.text = "10000.0đ"
-                    total = it + 10000.0 - 10000.0
-                    binding.tvTotalPrice.text = total.toString() + "đ"
-                    binding.tvTotalOrder.text = total.toString() + "đ"
-                }
-            }
-
-            binding.radExpressDelivery.setOnCheckedChangeListener{ _, isChecked ->
-                if (isChecked){
-                    binding.tvTransportFee.text = "15000.0đ"
-                    total = it + 15000.0 - 10000.0
-                    binding.tvTotalPrice.text = total.toString() + "đ"
-                    binding.tvTotalOrder.text = total.toString() + "đ"
-                }
+        binding.radExpressDelivery.setOnCheckedChangeListener{ _, isChecked ->
+            if (isChecked){
+                binding.tvTransportFee.text = "15000.0đ"
+                total = totalPrice!! + 15000.0 - 10000.0
+                binding.tvTotalPrice.text = total.toString() + "đ"
+                binding.tvTotalOrder.text = total.toString() + "đ"
             }
         }
 
@@ -100,37 +97,36 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
             }
 
             if(delivery != null && payment != null){
-                val order = Order(
-                    orderId = "",
-                    userName = binding.tvUserName.text.toString(),
-                    phoneNumber = binding.tvPhoneNumber.text.toString(),
-                    totalPrice = total,
-                    address = binding.tvAddress.text.toString(),
-                    deliveryMethods = delivery,
-                    paymentMethods = payment,
-                    describeOrder = describeOrder,
-                    orderStatus = "Chờ xác nhận",
-                    adminId = ""
-                )
-                loading(true)
-                cartViewModel.addOrder(order)
-                cartViewModel.isCheck.observe(viewLifecycleOwner){check ->
-                    if(check){
-                        loading(false)
-                        cartViewModel.getCartId()
-                        cartViewModel.getCartId.observe(viewLifecycleOwner){
-                            for(cartId in it){
-                                cartViewModel.deleteCart(cartId)
+                accountViewModel.getUserDetail()
+                accountViewModel.getUser.observe(viewLifecycleOwner){user ->
+                    accountViewModel.getFirebaseUser(user?.email.toString(), user?.password.toString())
+                    accountViewModel.getUserData.observe(viewLifecycleOwner){firebaseUser ->
+                        val order = Order(
+                            userName = binding.tvUserName.text.toString(),
+                            phoneNumber = binding.tvPhoneNumber.text.toString(),
+                            totalPrice = total,
+                            address = binding.tvAddress.text.toString(),
+                            deliveryMethods = delivery,
+                            paymentMethods = payment,
+                            describeOrder = describeOrder,
+                            orderStatus = "Chờ xác nhận",
+                            userId = firebaseUser.uid,
+                            adminId = cartAdmin.adminId
+                        )
+                        loading()
+                        cartViewModel.addOrder(order)
+                        cartViewModel.getCartDetail(cartAdmin.adminId.toString())
+                        cartViewModel.getCartFirebase.observe(viewLifecycleOwner){
+                            for(cart in it){
+                                cartViewModel.deleteCartDetail(cart.foodId.toString())
                             }
                         }
-                        val dialog = OrderSuccessDialog(object: OnClickListener {
-                            override fun onClick() {
-                                callback.showFragment(OrderFragment::class.java, HomeUserFragment::class.java, 0, 0, data,false)
-                            }
-                        })
-                        dialog.show(requireActivity().supportFragmentManager, "order_success_dialog")
+                        cartViewModel.deleteCartAdmin(cartAdmin.adminId.toString())
+                        notify("Đặt hàng thành công")
+                        callback.showFragment(OrderFragment::class.java, PurchaseOrderFragment::class.java, 0, 0, firebaseUser,false)
                     }
                 }
+
             }
         }
 
@@ -139,14 +135,9 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
         }
     }
 
-    private fun loading(isLoading: Boolean){
-        if(isLoading){
-            binding.btnConfirmOrder.visibility = View.INVISIBLE
-            binding.proBarBtnOrder.visibility = View.VISIBLE
-        }else{
-            binding.btnConfirmOrder.visibility = View.VISIBLE
-            binding.proBarBtnOrder.visibility = View.INVISIBLE
-        }
+    private fun loading(){
+        binding.btnConfirmOrder.visibility = View.INVISIBLE
+        binding.proBarBtnOrder.visibility = View.VISIBLE
     }
 
 }

@@ -237,7 +237,8 @@
                     android:layout_height="140dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/cart_8_background" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -270,7 +271,7 @@
     </ScrollView>
 
     <FrameLayout
-        android:id="@+id/frameLayout2"
+        android:id="@+id/layoutButtonAdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"

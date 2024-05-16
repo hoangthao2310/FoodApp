@@ -20,9 +20,9 @@ class ProfileAdminFragment : BaseFragment<FragmentProfileAdminBinding>() {
         firebaseUser = data as FirebaseUser
         accountViewModel.getUserDetail(firebaseUser.uid)
         accountViewModel.getUser.observe(viewLifecycleOwner){user ->
-            binding.tvUserName.text = user.userName
-            binding.tvEmail.text = user.emailAdress
-            Glide.with(requireContext()).load(user.imageUser).into(binding.imgUser)
+            binding.tvUserName.text = user?.userName
+            binding.tvEmail.text = user?.email
+            Glide.with(requireContext()).load(user?.imageUser).into(binding.imgUser)
         }
 
         binding.btnHome.setOnClickListener {

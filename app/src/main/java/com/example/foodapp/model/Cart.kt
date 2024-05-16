@@ -1,11 +1,11 @@
 package com.example.foodapp.model
 
 data class Cart(
-    val cartId: String?,
-    val foodId: String?,
-    val foodName: String?,
-    val price: Double?,
-    var quantity: Int?,
-    val image: String?,
-    var intoMoney: Double?
+    val foodId: String? = null,
+    val foodName: String? = null,
+    val price: Double? = null,
+    var quantity: Int? = null,
+    val image: String? = null,
+    var intoMoney: Double? = null,
+    val adminId: String? = null
 )

@@ -1,25 +1,21 @@
-package com.example.foodapp.view.profileUser.location
+package com.example.foodapp.view.cart
 
-import android.location.Address
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodapp.base.BaseFragment
-import com.example.foodapp.databinding.FragmentAddToSavedLocationBinding
+import com.example.foodapp.databinding.FragmentAddInfoUserOrderBinding
 import com.example.foodapp.model.Location
 import com.example.foodapp.viewmodel.AccountViewModel
 
-class AddToSavedLocationFragment : BaseFragment<FragmentAddToSavedLocationBinding>() {
+
+class AddInfoUserOrderFragment : BaseFragment<FragmentAddInfoUserOrderBinding>() {
     private lateinit var accountViewModel: AccountViewModel
-    private lateinit var address: List<Address>
-    override fun getLayout(container: ViewGroup?): FragmentAddToSavedLocationBinding =
-        FragmentAddToSavedLocationBinding.inflate(layoutInflater, container, false)
+    override fun getLayout(container: ViewGroup?): FragmentAddInfoUserOrderBinding =
+        FragmentAddInfoUserOrderBinding.inflate(layoutInflater, container, false)
 
     override fun initViews() {
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
-        address = data as List<Address>
-
-        binding.edtAddress.setText(address[0].getAddressLine(0))
 
         binding.btnSaveLocation.setOnClickListener {
             val newLocation = Location(
@@ -30,23 +26,20 @@ class AddToSavedLocationFragment : BaseFragment<FragmentAddToSavedLocationBindin
                 contactPhoneNumber = binding.edtPhoneNumber.text.toString()
             )
             loading(true)
-            if(binding.cbChooseDefault.isChecked){
-                accountViewModel.updateInfoUserOrder(newLocation)
-            }
             accountViewModel.addLocation(newLocation)
             accountViewModel.getLocationStatus.observe(viewLifecycleOwner){
                 if(it){
                     loading(false)
-                    callback.showFragment(AddToSavedLocationFragment::class.java, SavedLocationFragment::class.java, 0, 0, null, true)
-                    notify("Lưu địa chỉ thành công")
+                    parentFragmentManager.popBackStack()
+                    notify("Lưu thành công")
                 }
             }
         }
 
-
         binding.btnBack.setOnClickListener {
             callback.backToPrevious()
         }
+
     }
 
     private fun loading(isLoading: Boolean){

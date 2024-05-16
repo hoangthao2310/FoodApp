@@ -3,19 +3,19 @@ package com.example.foodapp.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.foodapp.OnItemCartClickListener
 import com.example.foodapp.databinding.ItemCartBinding
 import com.example.foodapp.model.Cart
-import com.example.foodapp.viewmodel.CartViewModel
+import java.lang.ref.WeakReference
 
 class CartAdapter(
-    private var listCart: List<Cart>,
+    var listCart: ArrayList<Cart>,
     private val itemClick: OnItemCartClickListener
 ) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
     inner class CartViewHolder(private val binding: ItemCartBinding): RecyclerView.ViewHolder(binding.root){
+        private val view = WeakReference(itemView)
         @SuppressLint("SetTextI18n")
         fun bind(cart: Cart) {
             binding.tvNameItem.text = cart.foodName
@@ -39,6 +39,21 @@ class CartAdapter(
                 itemClick.onItemReduceClick(listCart[adapterPosition])
             }
         }
+
+        init {
+            view.get()?.let {
+                it.setOnClickListener{
+                    //click item to reset swiped position
+                    if(view.get()?.scrollX != 0){
+                        view.get()?.scrollTo(0, 0)
+                    }
+                }
+            }
+
+            binding.tvDelete.setOnClickListener {
+                itemClick.onDeleteFood(listCart[adapterPosition])
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
@@ -55,4 +70,8 @@ class CartAdapter(
         holder.bind(listCart[position])
     }
 
+    fun removeItem(position: Int) {
+        listCart.removeAt(position)
+        notifyItemRemoved(position)
+    }
 }

@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseUser
 class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
     private lateinit var logViewModel: AccountViewModel
     private lateinit var firebaseUser: FirebaseUser
-    private lateinit var imageUri: Uri
+    private var imageUri: Uri? = null
 
     companion object{
         private const val REQUEST_CODE_PICK_IMAGE = 100
@@ -30,22 +30,25 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
         logViewModel.getUserDetail(firebaseUser.uid)
 
         logViewModel.getUser.observe(viewLifecycleOwner){user ->
-            binding.edtUserName.setText(user.userName)
-            binding.edtEmail.setText(user.emailAdress)
-            Glide.with(requireActivity()).load(user.imageUser).into(binding.imgUser)
+            binding.edtUserName.setText(user?.userName)
+            binding.edtEmail.setText(user?.email)
+            Glide.with(requireActivity()).load(user?.imageUser).into(binding.imgUser)
         }
 
         binding.btnSaveChanges.setOnClickListener {
             val userNew = User(
                 userName = binding.edtUserName.text.toString(),
-                emailAdress = binding.edtEmail.text.toString(),
+                email = binding.edtEmail.text.toString(),
             )
 
             loading(true)
-            logViewModel.updateProfileUser(firebaseUser.uid, userNew, imageUri)
+            if(imageUri != null){
+                logViewModel.updateImageUser(imageUri!!)
+            }
+            logViewModel.updateProfileUser(userNew)
             logViewModel.getUserData.observe(viewLifecycleOwner){userData ->
                 logViewModel.getLogStatus.observe(this){
-                    if(it){
+                    if(it == true){
                         loading(false)
                         callback.showFragment(EditProfileFragment::class.java, ProfileFragment::class.java, 0,0, userData, true)
                     }

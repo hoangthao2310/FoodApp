@@ -28,15 +28,16 @@ class HomeUserFragment : BaseFragment<FragmentHomeUserBinding>() {
     private lateinit var bestFoodAdapter: BestFoodAdapter
     private lateinit var categoryAdapter: CategoryAdapter
     private lateinit var firebaseUser: FirebaseUser
+
     override fun getLayout(container: ViewGroup?): FragmentHomeUserBinding =
         FragmentHomeUserBinding.inflate(layoutInflater, container, false)
 
     override fun initViews() {
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
         firebaseUser = data as FirebaseUser
-        accountViewModel.getUserDetail(firebaseUser.uid)
+        accountViewModel.getUserDetail()
         accountViewModel.getUser.observe(viewLifecycleOwner){
-            binding.tvUserName.text = it.userName
+            binding.tvUserName.text = it?.userName
         }
 
         binding.btnProfile.setOnClickListener {
@@ -46,7 +47,6 @@ class HomeUserFragment : BaseFragment<FragmentHomeUserBinding>() {
         foodViewModel = ViewModelProvider(this)[FoodViewModel::class.java]
         cartViewModel = ViewModelProvider(this)[CartViewModel::class.java]
         foodViewModel.bestFood()
-        foodViewModel.category()
 
         foodViewModel.getFood.observe(viewLifecycleOwner){ listBestFood ->
             if(listBestFood != null){
@@ -57,25 +57,6 @@ class HomeUserFragment : BaseFragment<FragmentHomeUserBinding>() {
                     }
 
                     override fun onItemAddClick(data: Any?) {
-                        val food = data as Food
-                        accountViewModel.getInfoAdmin(food.adminId.toString())
-                        accountViewModel.getInfoAdmin.observe(viewLifecycleOwner){userName ->
-                            cartViewModel.addCartAdmin(food.adminId.toString(), userName, 1)
-                            cartViewModel.getCart(food.adminId.toString())
-                            cartViewModel.getCartFirebase.observe(viewLifecycleOwner){listItemCart->
-                                if(!listItemCart.contains(listItemCart.find { it.foodId == food.foodId })){
-                                    cartViewModel.addCart(food, 1, food.price!!)
-                                    cartViewModel.isCheck.observe(viewLifecycleOwner){
-                                        if(it){
-                                            notify("Đã thêm vào giỏ hàng")
-                                        }
-                                    }
-                                }else{
-                                    notify("Đã có trong giỏ hàng")
-                                }
-                            }
-                        }
-
                     }
 
                     override fun onItemEditClick(data: Any?) {
@@ -92,6 +73,7 @@ class HomeUserFragment : BaseFragment<FragmentHomeUserBinding>() {
 
         }
 
+        foodViewModel.category()
         foodViewModel.getCategory.observe(viewLifecycleOwner){ listCategory ->
             if(listCategory != null){
                 val onItemClickListener = object : OnItemClickListener{

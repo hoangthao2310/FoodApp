@@ -13,61 +13,54 @@ class CartViewModel(application: Application): AndroidViewModel(application) {
     private val cartRepository: CartRepository
     private val cartLiveData: MutableLiveData<ArrayList<Cart>>
     private val cartAdminLiveData: MutableLiveData<ArrayList<CartAdmin>>
-    private var checkAdd: MutableLiveData<Boolean>
-    private var total: MutableLiveData<Double>
     private var cartId: MutableLiveData<ArrayList<String>>
     private var orderLiveData: MutableLiveData<ArrayList<Order>>
 
     val getCartFirebase: MutableLiveData<ArrayList<Cart>>
         get() = cartLiveData
-    val isCheck: MutableLiveData<Boolean>
-        get() = checkAdd
-    val totalPrice: MutableLiveData<Double>
-        get() = total
-    val getCartId: MutableLiveData<ArrayList<String>>
-        get() = cartId
     val getOrderFirebase: MutableLiveData<ArrayList<Order>>
         get() = orderLiveData
     val getCartAdmin: MutableLiveData<ArrayList<CartAdmin>>
         get() = cartAdminLiveData
     init {
         cartRepository = CartRepository(application)
-        checkAdd = cartRepository.isCheckAddCart
         cartLiveData = cartRepository.getCartFirebase
-        total = cartRepository.totalPriceCart
         cartId = cartRepository.cartId
         orderLiveData = cartRepository.getOrderFirebase
         cartAdminLiveData = cartRepository.getCartAdminFirebase
     }
-    fun addCartAdmin(adminId: String, userName: String, quantityFood: Int){
-        cartRepository.addCartAdmin(adminId, userName, quantityFood)
+    fun addCartAdmin(adminId: String, userName: String, foodName: String){
+        cartRepository.addCartAdmin(adminId, userName, foodName)
     }
     fun getCartAdmin(){
         cartRepository.getCartAdmin()
     }
 
-    fun addCart(food: Food, quantity: Int, intoMoney: Double){
-        cartRepository.addCart(food, quantity, intoMoney)
+    fun addCartDetail(food: Food, quantity: Int, intoMoney: Double){
+        cartRepository.addCartDetail(food, quantity, intoMoney)
     }
-    fun getCart(adminId: String){
-        cartRepository.getCart(adminId)
+    fun getCartDetail(adminId: String){
+        cartRepository.getCartDetail(adminId)
     }
-    fun getCartId(){
-        cartRepository.getIdCart()
-    }
-    fun updateQuantity(cart: Cart, adminId: String){
-        cartRepository.updateQuantity(cart, adminId)
-    }
-    fun totalPrice(adminId: String){
-        cartRepository.totalPrice(adminId)
+    fun updateQuantity(cart: Cart){
+        cartRepository.updateQuantity(cart)
     }
     fun addOrder(order: Order){
         cartRepository.addOrder(order)
     }
-    fun getOrder(){
-        cartRepository.getOrder()
+    fun getOrder(id: String){
+        cartRepository.getOrder(id)
     }
-    fun deleteCart(foodId: String){
-        cartRepository.deleteCart(foodId)
+    fun getOrderAdmin(id: String){
+        cartRepository.getOrderAdmin(id)
+    }
+    fun updateOrder(orderId: String, orderStatus: String){
+        cartRepository.updateOrder(orderId, orderStatus)
+    }
+    fun deleteCartAdmin(cartAdminId: String){
+        cartRepository.deleteCartAdmin(cartAdminId)
+    }
+    fun deleteCartDetail(cartDetailId: String){
+        cartRepository.deleteCartDetail(cartDetailId)
     }
 }

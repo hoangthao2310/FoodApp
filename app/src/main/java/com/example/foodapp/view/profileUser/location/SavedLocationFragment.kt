@@ -56,7 +56,7 @@ class SavedLocationFragment : BaseFragment<FragmentSavedLocationBinding>() {
             }
         }
         binding.layoutAddAddress.setOnClickListener {
-            callback.showFragment(SavedLocationFragment::class.java, MapsFragment::class.java, 0, 0, data, false)
+            callback.showFragment(SavedLocationFragment::class.java, MapsFragment::class.java, 0, 0, data, true)
         }
 
         binding.btnBack.setOnClickListener {

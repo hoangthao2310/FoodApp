@@ -20,11 +20,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     override fun initViews() {
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
         firebaseUser = data as FirebaseUser
-        accountViewModel.getUserDetail(firebaseUser.uid)
+        accountViewModel.getUserDetail()
         accountViewModel.getUser.observe(viewLifecycleOwner){user->
-            binding.tvUserName.text = user.userName
-            binding.tvEmail.text = user.emailAdress
-            Glide.with(requireActivity()).load(user.imageUser).into(binding.imgUser)
+            binding.tvUserName.text = user?.userName
+            binding.tvEmail.text = user?.email
+            Glide.with(requireActivity()).load(user?.imageUser).into(binding.imgUser)
         }
 
         binding.btnEdit.setOnClickListener {

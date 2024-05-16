@@ -26,9 +26,6 @@ class BestFoodAdapter(
             binding.layoutItemFood.setOnClickListener {
                 itemClick.onItemClick(listFood[adapterPosition])
             }
-            binding.btnAddFood.setOnClickListener {
-                itemClick.onItemAddClick(listFood[adapterPosition])
-            }
         }
     }
 

@@ -7,4 +7,5 @@ data class Location(
     val note: String? = null,
     val contactPersonName: String? = null,
     val contactPhoneNumber: String? = null,
+    val userId: String? = null
 )

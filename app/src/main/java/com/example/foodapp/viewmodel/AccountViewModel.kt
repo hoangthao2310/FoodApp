@@ -12,18 +12,16 @@ import com.google.firebase.auth.FirebaseUser
 
 class AccountViewModel(application: Application) : AndroidViewModel(application) {
     private var accountRepository: AccountRepository
-    private var user: MutableLiveData<User>
+    private var user: MutableLiveData<User?>
     private var location: MutableLiveData<ArrayList<Location>>
     private var userFirebase: MutableLiveData<FirebaseUser>
     private var logStatus: MutableLiveData<Boolean>
     private var locationStatus: MutableLiveData<Boolean>
-    private var logAdminStatus: MutableLiveData<Boolean>
     private var favouriteFood: MutableLiveData<ArrayList<Food>>
-    private var infoAdmin: MutableLiveData<String>
 
     val getUserData: MutableLiveData<FirebaseUser>
         get() = userFirebase
-    val getUser: MutableLiveData<User>
+    val getUser: MutableLiveData<User?>
         get() = user
     val getLocation: MutableLiveData<ArrayList<Location>>
         get() = location
@@ -31,12 +29,8 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
         get() = logStatus
     val getLocationStatus: MutableLiveData<Boolean>
         get() = locationStatus
-    val getLogAdminStatus: MutableLiveData<Boolean>
-        get() = logAdminStatus
     val getFavouriteFood: MutableLiveData<ArrayList<Food>>
         get() = favouriteFood
-    val getInfoAdmin: MutableLiveData<String>
-        get() = infoAdmin
     init {
         accountRepository = AccountRepository(application)
         user = accountRepository.getUser
@@ -44,9 +38,7 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
         logStatus = accountRepository.isCheckLog
         location = accountRepository.getUserLocation
         locationStatus = accountRepository.isCheckLocation
-        logAdminStatus = accountRepository.getCheckAdmin
         favouriteFood = accountRepository.getFavouriteFood
-        infoAdmin = accountRepository.getInfoAdmin
     }
 
     fun register(email: String, password: String, name: String, checkAdmin: Boolean){
@@ -56,12 +48,20 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     fun login(email: String, password: String, isRemember: Boolean){
         accountRepository.login(email, password, isRemember)
     }
+    fun getFirebaseUser(email: String, password: String){
+        accountRepository.getFirebaseUser(email, password)
+    }
     fun getUserDetail(userId: String){
         accountRepository.getUserDetail(userId)
     }
-
-    fun updateProfileUser(userId: String, user: User, imageUri: Uri){
-        accountRepository.updateProfileUser(userId, user, imageUri)
+    fun getUserDetail(){
+        accountRepository.getUserDetail()
+    }
+    fun updateImageUser(imageUri: Uri){
+        accountRepository.updateImageUser(imageUri)
+    }
+    fun updateProfileUser(user: User){
+        accountRepository.updateProfileUser(user)
     }
     fun updateInfoUserOrder(location: Location){
         accountRepository.updateInfoUserOrder(location)
@@ -75,15 +75,11 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     fun getLocation(){
         accountRepository.getLocation()
     }
-
     fun updateLocation(locationId: String, location: Location){
         accountRepository.updateLocation(locationId, location)
     }
     fun deleteLocation(locationId: String){
         accountRepository.deleteLocation(locationId)
-    }
-    fun checkAdmin(){
-        accountRepository.checkAdmin()
     }
     fun addFavouriteFood(food: Food){
         accountRepository.addFavouriteFood(food)
@@ -93,8 +89,5 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     }
     fun deleteFavouriteFood(foodId: String){
         accountRepository.deleteFavouriteFood(foodId)
-    }
-    fun getInfoAdmin(adminId: String){
-        accountRepository.getInfoAdmin(adminId)
     }
 }

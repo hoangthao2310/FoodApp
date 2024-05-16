@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.profileUser.location.EditToSavedLocationFragment">
+    tools:context=".view.cart.AddInfoUserOrderFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,10 +19,9 @@
             android:paddingBottom="200dp"
             android:orientation="vertical">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/btnBack"
@@ -30,21 +29,24 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/leftarrow" />
 
                 <TextView
                     android:id="@+id/tvCategoryName"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
                     android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/edit_saved_location"
+                    android:text="Thêm thông tin"
                     android:textSize="24sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -163,7 +165,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Tên người liên lạc"
-                    android:textColor="@color/black"
                     android:textSize="20sp"
                     android:layout_margin="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -200,31 +201,9 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvPhoneNumber" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <CheckBox
-                android:id="@+id/cbChooseDefault"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_default"
-                android:textStyle="bold"
-                android:textColor="@color/red_pink"
-                android:textSize="20sp"
-                android:textColorHint="@color/red_pink"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"/>
-            <TextView
-                android:id="@+id/btnDelete"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Xóa"
-                android:textColor="@color/red_pink"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:background="@color/white"
-                android:gravity="center"
-                />
         </LinearLayout>
     </ScrollView>
 
@@ -240,16 +219,15 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnSaveEditLocation"
+            android:id="@+id/btnSaveLocation"
             style="@android:style/Widget.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_background"
-            android:text="@string/save"
+            android:text="Lưu lại"
             android:textColor="@color/white"
             android:textSize="24sp"
-            android:textStyle="bold"
-            />
+            android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -258,5 +236,6 @@
             android:layout_gravity="center" />
 
     </FrameLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

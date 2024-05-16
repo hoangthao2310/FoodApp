@@ -11,15 +11,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:background="@color/red_pink">
+            android:layout_height="68dp"
+            android:background="@color/red_pink"
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/edtSearchAddress"
-                android:layout_width="280dp"
-                android:layout_height="48dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:layout_margin="8dp"
                 android:background="@drawable/grey_background"
                 android:hint="@string/enter_address"
@@ -27,30 +29,20 @@
                 android:textColor="@color/black"
                 android:textColorHint="@color/black"
                 android:textSize="20sp"
-                android:inputType="text"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btnSearchAddress"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:inputType="text" />
 
             <TextView
                 android:id="@+id/btnSearchAddress"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="Tìm kiếm"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:layout_marginEnd="8dp"
+                android:layout_margin="8dp"
+                android:gravity="center"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textStyle="bold" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

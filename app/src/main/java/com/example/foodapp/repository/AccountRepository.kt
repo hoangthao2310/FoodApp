@@ -6,38 +6,40 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
-import com.example.foodapp.model.FavouriteFood
 import com.example.foodapp.model.Food
 import com.example.foodapp.model.Location
 import com.example.foodapp.model.User
 import com.example.foodapp.until.PreferenceManager
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
 class AccountRepository (_application: Application){
     private var firebaseUser: MutableLiveData<FirebaseUser>
-    private var userLiveData: MutableLiveData<User>
+    private var userLiveData: MutableLiveData<User?>
     private var locationLiveData: MutableLiveData<ArrayList<Location>>
     private var userLog: MutableLiveData<Boolean>
-    private var adminLog: MutableLiveData<Boolean>
     private var checkLocation: MutableLiveData<Boolean>
     private var favouriteFoodLiveData: MutableLiveData<ArrayList<Food>>
-    private var infoAdmin: MutableLiveData<String>
 
     private var application: Application
     private var auth:FirebaseAuth
     private val defaultImage:String = "https://firebasestorage.googleapis.com/v0/b/food-app-2a650.appspot.com/o/user_image%2Fuser.png?alt=media&token=f220cf44-233f-43c2-9af7-fe907d00f938"
-    private val firestoreFirebase: FirebaseFirestore
     private val storageReference: StorageReference
     private val preferenceManager: PreferenceManager
+    private var database: FirebaseDatabase
 
     val getFirebaseUser: MutableLiveData<FirebaseUser>
         get() = firebaseUser
 
-    val getUser: MutableLiveData<User>
+    val getUser: MutableLiveData<User?>
         get() = userLiveData
     val getUserLocation: MutableLiveData<ArrayList<Location>>
         get() = locationLiveData
@@ -47,30 +49,24 @@ class AccountRepository (_application: Application){
 
     val isCheckLocation: MutableLiveData<Boolean>
         get() = checkLocation
-    val getCheckAdmin: MutableLiveData<Boolean>
-        get() = adminLog
     val getFavouriteFood: MutableLiveData<ArrayList<Food>>
         get() = favouriteFoodLiveData
-    val getInfoAdmin: MutableLiveData<String>
-        get() = infoAdmin
     init {
         application = _application
         firebaseUser = MutableLiveData<FirebaseUser>()
-        userLiveData = MutableLiveData<User>()
+        userLiveData = MutableLiveData<User?>()
         locationLiveData = MutableLiveData<ArrayList<Location>>()
         userLog = MutableLiveData<Boolean>(false)
         checkLocation = MutableLiveData<Boolean>(false)
-        adminLog = MutableLiveData<Boolean>()
         favouriteFoodLiveData = MutableLiveData<ArrayList<Food>>()
-        infoAdmin = MutableLiveData<String>()
 
         auth = FirebaseAuth.getInstance()
         if(auth.currentUser != null){
             firebaseUser.postValue(auth.currentUser)
         }
-        firestoreFirebase = FirebaseFirestore.getInstance()
         storageReference =FirebaseStorage.getInstance().getReference("user_image/"+auth.currentUser?.uid)
         preferenceManager = PreferenceManager(application)
+        database = Firebase.database
     }
 
     fun register(email: String, password: String, name: String, checkAdmin: Boolean){
@@ -78,17 +74,17 @@ class AccountRepository (_application: Application){
             if(it.isSuccessful){
                 firebaseUser.postValue(auth.currentUser)
                 userLog.postValue(true)
-                val user = User(name, email, password, defaultImage, checkAdmin)
-                firestoreFirebase.collection("users").document(auth.uid!!)
-                    .set(user)
-                    .addOnCompleteListener {
+                val user = User(auth.currentUser?.uid.toString(), name, email, password, defaultImage, checkAdmin)
+                database.getReference("Users").child(auth.currentUser?.uid.toString())
+                    .setValue(user).addOnCompleteListener {
                         if(it.isSuccessful){
-                            Toast.makeText(application, "Cập nhật thông tin người dùng thành công", Toast.LENGTH_LONG).show()
-                        }else{
-                            Toast.makeText(application, it.exception.toString(), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(application, "Đăng ký thành công", Toast.LENGTH_LONG).show()
+                            Log.d("Register", "Register Successful")
                         }
                     }
-                Toast.makeText(application, "Đăng ký thành công", Toast.LENGTH_LONG).show()
+                    .addOnFailureListener {
+                        Log.d("Register", it.message.toString())
+                    }
             }else{
                 userLog.postValue(false)
                 Toast.makeText(application, "Đăng ký không thành công", Toast.LENGTH_SHORT).show()
@@ -115,40 +111,73 @@ class AccountRepository (_application: Application){
             }
         }
     }
-
-    fun getUserDetail(userID: String){
-        firestoreFirebase.collection("users").document(userID)
-            .get()
-            .addOnSuccessListener {documentSnapshot ->
-                if(documentSnapshot.exists()){
-                    val user = documentSnapshot.toObject(User::class.java)
-                    userLiveData.postValue(user!!)
-                }
+    fun getFirebaseUser(email: String, password: String){
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
+            if(it.isSuccessful){
+                firebaseUser.postValue(auth.currentUser)
             }
-            .addOnFailureListener {
-                Log.d("getUserDetail", "Error getting user detail: $it")
-            }
+        }
     }
 
-    fun updateProfileUser(userId: String, user: User, imageUri: Uri){
+    fun getUserDetail(userID: String){
+        database.getReference("Users").child(userID).addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(User::class.java)
+                userLiveData.postValue(user)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("getUserDetail", "Failed to read value.", error.toException())
+            }
+        })
+    }
+
+    fun getUserDetail(){
+        database.getReference("Users").child(auth.currentUser?.uid.toString())
+            .addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(User::class.java)
+                userLiveData.postValue(user)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("getUserDetail", "Failed to read value.", error.toException())
+            }
+
+        })
+    }
+
+    fun updateImageUser(imageUri: Uri){
         storageReference.putFile(imageUri).addOnSuccessListener {
             storageReference.downloadUrl.addOnSuccessListener { uri ->
                 val updateUser:HashMap<String, Any> = HashMap()
-                updateUser["userName"] = user.userName.toString()
-                updateUser["emailAdress"] = user.emailAdress.toString()
                 updateUser["imageUser"] = uri.toString()
-                firestoreFirebase.collection("users").document(userId)
-                    .update(updateUser)
+                database.getReference("Users").child(auth.currentUser?.uid.toString())
+                    .updateChildren(updateUser)
                     .addOnCompleteListener {
-                        userLog.postValue(true)
-                        Toast.makeText(application, "cập nhật thành công", Toast.LENGTH_LONG).show()
+                        Log.d("update Image User", "Successful")
                     }
                     .addOnFailureListener {
-                        userLog.postValue(false)
-                        Toast.makeText(application, "cập nhật không thành công", Toast.LENGTH_LONG).show()
+                        Log.d("update Image User", "Fail")
                     }
             }
         }
+    }
+
+    fun updateProfileUser(user: User){
+        val updateUser:HashMap<String, Any> = HashMap()
+        updateUser["userName"] = user.userName.toString()
+        updateUser["email"] = user.email.toString()
+        database.getReference("Users").child(auth.currentUser?.uid.toString())
+            .updateChildren(updateUser)
+            .addOnCompleteListener {
+                userLog.postValue(true)
+                Toast.makeText(application, "cập nhật thành công", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener {
+                userLog.postValue(false)
+                Toast.makeText(application, "cập nhật không thành công", Toast.LENGTH_LONG).show()
+            }
     }
 
     fun updateInfoUserOrder(location: Location){
@@ -157,8 +186,8 @@ class AccountRepository (_application: Application){
         newLocation["note"] = location.note.toString()
         newLocation["contactPersonName"] = location.contactPersonName.toString()
         newLocation["contactPhoneNumber"] = location.contactPhoneNumber.toString()
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
-            .update(newLocation)
+        database.getReference("Users").child(auth.currentUser?.uid.toString())
+            .updateChildren(newLocation)
             .addOnSuccessListener {
                 checkLocation.postValue(true)
                 Log.d(ContentValues.TAG, "Location updated successfully!")
@@ -176,11 +205,12 @@ class AccountRepository (_application: Application){
         newLocation["note"] = location.note.toString()
         newLocation["contactPersonName"] = location.contactPersonName.toString()
         newLocation["contactPhoneNumber"] = location.contactPhoneNumber.toString()
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("location")
-            .add(newLocation)
-            .addOnSuccessListener { documentReference ->
+        newLocation["userId"] = location.userId.toString()
+        database.getReference("Location")
+            .setValue(newLocation)
+            .addOnSuccessListener {
                 checkLocation.postValue(true)
-                Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                Log.d(ContentValues.TAG, "addLocation Successful")
             }
             .addOnFailureListener {e ->
                 Log.w(ContentValues.TAG, "Error adding document", e)
@@ -188,34 +218,21 @@ class AccountRepository (_application: Application){
     }
 
     fun getLocation(){
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("location")
-            .get()
-            .addOnCompleteListener {task ->
-                if(task.isSuccessful && task.result!=null){
-                    val listLocation = ArrayList<Location>()
-                    for(document in task.result){
-                        val locationId = document.id
-                        val addressName = document.getString("addressName")
-                        val address = document.getString("address")
-                        val note = document.getString("note")
-                        val contactPersonName = document.getString("contactPersonName")
-                        val contactPhoneNumber = document.getString("contactPhoneNumber")
-                        val location = Location(
-                            locationId,
-                            addressName,
-                            address,
-                            note,
-                            contactPersonName,
-                            contactPhoneNumber
-                        )
-                        listLocation.add(location)
+        database.getReference("Location")
+            .addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = ArrayList<Location>()
+                    for(itemSnap in snapshot.children){
+                        val location = itemSnap.getValue(Location::class.java)
+                        list.add(location!!)
                     }
-                    locationLiveData.postValue(listLocation)
+                    locationLiveData.postValue(list)
                 }
-            }
-            .addOnFailureListener {
-                Log.d("getLocation", "Error getting location: $it")
-            }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(ContentValues.TAG, "Failed to read location.", error.toException())
+                }
+
+            })
     }
 
     fun updateLocation(locationId: String, location: Location){
@@ -225,9 +242,8 @@ class AccountRepository (_application: Application){
         newLocation["note"] = location.note.toString()
         newLocation["contactPersonName"] = location.contactPersonName.toString()
         newLocation["contactPhoneNumber"] = location.contactPhoneNumber.toString()
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
-            .collection("location").document(locationId)
-            .update(newLocation)
+        database.getReference("Location").child(locationId)
+            .updateChildren(newLocation)
             .addOnSuccessListener {
                 checkLocation.postValue(true)
                 Log.d(ContentValues.TAG, "Location updated successfully!")
@@ -238,8 +254,8 @@ class AccountRepository (_application: Application){
     }
 
     fun deleteLocation(locationId: String){
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("location").document(locationId)
-            .delete()
+        database.getReference("Location").child(locationId)
+            .removeValue()
             .addOnCompleteListener {
                 Log.d("Delete Location", "DocumentSnapshot successfully deleted!")
                 Toast.makeText(application, "Xóa thành công", Toast.LENGTH_LONG).show()
@@ -251,18 +267,6 @@ class AccountRepository (_application: Application){
     fun logout(){
         auth.signOut()
         preferenceManager.clear()
-    }
-
-    fun checkAdmin(){
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
-            .get()
-            .addOnCompleteListener { task ->
-                val isCheck = task.result.getBoolean("checkAdmin")
-                adminLog.postValue(isCheck!!)
-            }
-            .addOnFailureListener {
-                Log.d("checkAdmin", it.toString())
-            }
     }
 
     fun addFavouriteFood(food: Food){
@@ -277,9 +281,9 @@ class AccountRepository (_application: Application){
         favourite["bestFood"] = food.bestFood!!
         favourite["adminId"] = food.adminId.toString()
         favourite["categoryId"] = food.categoryId.toString()
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
-            .collection("favouriteFood")
-            .add(favourite)
+        favourite["userId"] = auth.currentUser?.uid.toString()
+        database.getReference("FavouriteFood").child(food.foodId.toString())
+            .setValue(favourite)
             .addOnSuccessListener {
                 Toast.makeText(application, "Đã thêm món ăn vào mục yêu thích", Toast.LENGTH_LONG).show()
             }
@@ -289,67 +293,32 @@ class AccountRepository (_application: Application){
     }
 
     fun getFavouriteFood(){
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid).collection("favouriteFood")
-            .get()
-            .addOnCompleteListener { task ->
-                if(task.isSuccessful && task.result != null){
+        database.getReference("FavouriteFood").orderByChild("userId").equalTo(auth.currentUser?.uid.toString())
+            .addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
                     val list = ArrayList<Food>()
-                    for(document in task.result){
-                        val favouriteId = document.id
-                        val foodId = document.getString("foodId")
-                        val foodName = document.getString("foodName")
-                        val price = document.getDouble("price")
-                        val time = document.getString("time")
-                        val rating = document.getDouble("rating")
-                        val image = document.getString("image")
-                        val describe = document.getString("describe")
-                        val bestFood = document.getBoolean("bestFood")
-                        val adminId = document.getString("adminId")
-                        val categoryId = document.getString("categoryId")
-                        val food = Food(
-                            foodId,
-                            foodName,
-                            price,
-                            rating,
-                            time,
-                            image,
-                            describe,
-                            bestFood,
-                            adminId,
-                            categoryId,
-                            favouriteId
-                        )
-                        list.add(food)
+                    for(itemSnap in snapshot.children){
+                        val favourite = itemSnap.getValue(Food::class.java)
+                        list.add(favourite!!)
                     }
                     favouriteFoodLiveData.postValue(list)
                 }
-            }
-            .addOnFailureListener {
-                Log.d("getFavouriteFood", "Error getting favourite food: $it")
-            }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(ContentValues.TAG, "Failed to read location.", error.toException())
+                }
+
+            })
     }
 
     fun deleteFavouriteFood(favouriteId: String){
-        firestoreFirebase.collection("users").document(auth.currentUser!!.uid)
-            .collection("favouriteFood").document(favouriteId)
-            .delete()
-            .addOnSuccessListener {
-                Log.d("deleteFavouriteFood", "DocumentSnapshot successfully deleted!")
+        database.getReference("FavouriteFood").child(favouriteId)
+            .removeValue()
+            .addOnCompleteListener {
+                Log.d("Delete FavouriteFood", "DocumentSnapshot successfully deleted!")
                 Toast.makeText(application, "Xóa thành công", Toast.LENGTH_LONG).show()
             }
-            .addOnFailureListener{
-                Toast.makeText(application, "Xóa không thành công", Toast.LENGTH_LONG).show()
-            }
-    }
-
-    fun getInfoAdmin(adminId: String){
-        firestoreFirebase.collection("users").document(adminId)
-            .get()
-            .addOnSuccessListener {
-                infoAdmin.postValue(it.getString("userName"))
-            }
             .addOnFailureListener {
-                Log.d("getInfoAdmin", "Fail ,${it}")
+                Toast.makeText(application, "Xóa không thành công", Toast.LENGTH_LONG).show()
             }
     }
 }

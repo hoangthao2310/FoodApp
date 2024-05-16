@@ -18,23 +18,20 @@ class PurchaseOrderAdapter(
     inner class PurchaseOrderViewHolder(private val binding: ItemPurchaseOrderBinding): RecyclerView.ViewHolder(binding.root){
         @SuppressLint("SetTextI18n")
         fun bind(order: Order){
-            binding.tvUserName.text = order.userName
-            binding.tvPhoneNumber.text = order.phoneNumber
-            binding.tvAddress.text = order.address
             binding.tvDescribe.text = order.describeOrder
             binding.tvTotalPrice.text = "${order.totalPrice}đ"
 
             when(order.orderStatus){
                 "Chưa xác nhận" -> {
-                    binding.tvStatusOrder.text = order.orderStatus
+                    binding.tvStatusOrder.text = "Trạng thái: " + order.orderStatus
                     binding.tvStatusOrder.setTextColor(Color.GRAY)
                 }
                 "Đã xác nhận" -> {
-                    binding.tvStatusOrder.text = order.orderStatus
+                    binding.tvStatusOrder.text = "Trạng thái: " + order.orderStatus
                     binding.tvStatusOrder.setTextColor(Color.GREEN)
                 }
                 "Đã hủy đơn hàng" -> {
-                    binding.tvStatusOrder.text = order.orderStatus
+                    binding.tvStatusOrder.text = "Trạng thái: " + order.orderStatus
                     binding.tvStatusOrder.setTextColor(Color.RED)
                 }
             }

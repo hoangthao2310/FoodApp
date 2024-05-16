@@ -1,8 +1,9 @@
 package com.example.foodapp.model
 
 data class User (
+    val userId: String? = null,
     val userName: String? = null,
-    val emailAdress: String? = null,
+    val email: String? = null,
     val password: String? = null,
     val imageUser: String? = null,
     val checkAdmin: Boolean? = null,

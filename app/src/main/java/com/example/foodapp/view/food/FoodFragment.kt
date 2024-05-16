@@ -9,14 +9,17 @@ import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentFoodBinding
 import com.example.foodapp.model.Category
 import com.example.foodapp.model.Food
+import com.example.foodapp.viewmodel.AccountViewModel
 import com.example.foodapp.viewmodel.CartViewModel
 import com.example.foodapp.viewmodel.FoodViewModel
 
 class FoodFragment : BaseFragment<FragmentFoodBinding>() {
     private lateinit var foodViewModel: FoodViewModel
     private lateinit var cartViewModel: CartViewModel
+    private lateinit var accountViewModel: AccountViewModel
     private lateinit var foodAdapter: FoodAdapter
     private lateinit var category: Category
+    private var list: String? = ""
 
     override fun getLayout(container: ViewGroup?): FragmentFoodBinding =
         FragmentFoodBinding.inflate(layoutInflater, container, false)
@@ -24,6 +27,7 @@ class FoodFragment : BaseFragment<FragmentFoodBinding>() {
     override fun initViews() {
         foodViewModel = ViewModelProvider(this)[FoodViewModel::class.java]
         cartViewModel = ViewModelProvider(this)[CartViewModel::class.java]
+        accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
         category = data as Category
         foodViewModel.food(category.categoryId)
 
@@ -39,19 +43,14 @@ class FoodFragment : BaseFragment<FragmentFoodBinding>() {
 
                     override fun onItemAddClick(data: Any?) {
                         val food = data as Food
-                        cartViewModel.getCart(food.adminId.toString())
-                        cartViewModel.getCartFirebase.observe(viewLifecycleOwner){listItemCart->
-                            if(!listItemCart.contains(listItemCart.find { it.foodId == food.foodId })){
-                                cartViewModel.addCart(food, 1, food.price!!)
-                                cartViewModel.isCheck.observe(viewLifecycleOwner){
-                                    if(it){
-                                        notify("Đã thêm vào giỏ hàng")
-                                    }
-                                }
-                            }else{
-                                notify("Đã có trong giỏ hàng")
-                            }
+                        list += food.foodName.toString() + " "
+                        accountViewModel.getUserDetail(food.adminId.toString())
+                        accountViewModel.getUser.observe(viewLifecycleOwner){user ->
+                            cartViewModel.addCartAdmin(food.adminId.toString(), user?.userName.toString(), list.toString())
                         }
+                        cartViewModel.addCartDetail(food, 1, food.price!!)
+                        cartViewModel.getCartDetail(food.adminId.toString())
+                        notify("Đã thêm vào giỏ hàng")
                     }
 
                     override fun onItemEditClick(data: Any?) {

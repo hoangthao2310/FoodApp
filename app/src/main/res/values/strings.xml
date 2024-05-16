@@ -75,7 +75,7 @@
     <string name="delete_item">Bạn có muốn xóa không?</string>
     <string name="yes">Có</string>
     <string name="no">Không</string>
-    <string name="select_address_order">Chọn địa chỉ khác</string>
+    <string name="select_address_order">Chọn địa chỉ</string>
     <string name="save_address">Lưu địa chỉ này</string>
     <string name="choose_default">Chọn làm địa chỉ mặc định</string>
     <string name="order_success">Đặt hàng thành công</string>
@@ -87,5 +87,10 @@
     <string name="select_image">Chọn ảnh</string>
     <string name="edit_food">Chỉnh sửa món ăn</string>
     <string name="saved">Lưu lại</string>
-    <string name="purchaseOrder">Đơn mua</string>
+    <string name="purchaseOrder">Đơn đặt hàng</string>
+    <string name="delete">Xóa</string>
+    <string name="confirm">xác nhận</string>
+    <string name="cancel_order">Hủy đơn hàng</string>
+    <string name="time">15 phút</string>
+    <string name="rating_number">5.0</string>
 </resources>

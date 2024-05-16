@@ -63,10 +63,11 @@
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         android:layout_marginStart="24dp"
-                        app:shapeAppearanceOverlay="@style/circular"
+                        android:scaleType="centerCrop"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
+                        app:shapeAppearanceOverlay="@style/circular"
                         app:srcCompat="@drawable/ic_launcher_background" />
 
                     <TextView
@@ -136,30 +137,30 @@
                     android:textColor="@color/black"/>
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/btnPayMethod"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="28dp"
-                android:layout_marginEnd="28dp">
+<!--            <LinearLayout-->
+<!--                android:id="@+id/btnPayMethod"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:layout_marginTop="20dp"-->
+<!--                android:layout_marginStart="28dp"-->
+<!--                android:layout_marginEnd="28dp">-->
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    app:srcCompat="@drawable/wallet" />
+<!--                <ImageView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="center_vertical"-->
+<!--                    app:srcCompat="@drawable/wallet" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/payMethod"
-                    android:layout_marginStart="16dp"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"/>
-            </LinearLayout>
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="@string/payMethod"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:textSize="24sp"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:textColor="@color/black"/>-->
+<!--            </LinearLayout>-->
 
             <LinearLayout
                 android:id="@+id/btnLocation"
@@ -282,7 +283,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Đơn mua"
+                        android:text="@string/purchaseOrder"
                         android:textAlignment="center"
                         android:textColor="@color/black"
                         android:textSize="12sp"

@@ -10,26 +10,24 @@ import com.example.foodapp.model.CartAdmin
 import com.example.foodapp.model.Food
 import com.example.foodapp.model.Order
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import kotlin.random.Random
 
 class CartRepository(_application: Application) {
     private var cartLiveData: MutableLiveData<ArrayList<Cart>>
     private var cartAdminLiveData: MutableLiveData<ArrayList<CartAdmin>>
-    private var checkAddFirebase: MutableLiveData<Boolean>
-    private var totalPriceLiveData: MutableLiveData<Double>
     private var cartIdLiveData: MutableLiveData<ArrayList<String>>
     private var orderLiveData: MutableLiveData<ArrayList<Order>>
 
     private val application: Application
-    private val firebaseFirestore: FirebaseFirestore
     private val auth: FirebaseAuth
+    private var database: FirebaseDatabase
 
     val getCartFirebase: MutableLiveData<ArrayList<Cart>>
         get() = cartLiveData
-    val isCheckAddCart: MutableLiveData<Boolean>
-        get() = checkAddFirebase
-    val totalPriceCart: MutableLiveData<Double>
-        get() = totalPriceLiveData
     val cartId: MutableLiveData<ArrayList<String>>
         get() = cartIdLiveData
     val getOrderFirebase: MutableLiveData<ArrayList<Order>>
@@ -38,133 +36,96 @@ class CartRepository(_application: Application) {
         get() = cartAdminLiveData
     init {
         application = _application
-        firebaseFirestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
-        checkAddFirebase = MutableLiveData<Boolean>(false)
-        totalPriceLiveData = MutableLiveData<Double>()
+        database = FirebaseDatabase.getInstance()
         cartIdLiveData = MutableLiveData<ArrayList<String>>()
         cartLiveData = MutableLiveData<ArrayList<Cart>>()
         orderLiveData = MutableLiveData<ArrayList<Order>>()
         cartAdminLiveData = MutableLiveData<ArrayList<CartAdmin>>()
     }
 
-    fun addCartAdmin(adminId: String, userName: String, quantityFood: Int){
+    fun addCartAdmin(adminId: String, userName: String, foodName: String){
         val addNew: HashMap<String, Any> = HashMap()
+        addNew["adminId"] = adminId
         addNew["userName"] = userName
-        addNew["quantityFood"] = quantityFood
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
-            .collection("cart").document(adminId)
-            .set(addNew)
+        addNew["foodName"] = foodName
+        addNew["userId"] = auth.currentUser!!.uid
+        database.getReference("CartAdmin").child(adminId)
+            .setValue(addNew)
             .addOnSuccessListener {
-                Log.d(ContentValues.TAG, "Success")
+                Log.d(ContentValues.TAG, "addCartAdmin Success")
             }
             .addOnFailureListener {
-                Log.w(ContentValues.TAG, "Error adding document", it)
+                Log.w(ContentValues.TAG, "Error adding cartAdmin", it)
             }
     }
 
     fun getCartAdmin(){
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
-            .collection("cart")
-            .get()
-            .addOnCompleteListener { task ->
-                if(task.isSuccessful && task.result != null){
-                    val list = ArrayList<CartAdmin>()
-                    for(document in task.result){
-                        val adminId = document.id
-                        val userName = document.getString("userName")
-                        val quantityFood = document.getLong("quantityFood")!!.toInt()
-                        val cartAdmin = CartAdmin(adminId, userName, quantityFood)
+        database.getReference("CartAdmin").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val list = ArrayList<CartAdmin>()
+                for(snap in snapshot.children){
+                    val cartAdmin = snap.getValue(CartAdmin::class.java)
+                    if (cartAdmin != null) {
                         list.add(cartAdmin)
                     }
-                    cartAdminLiveData.postValue(list)
                 }
+                cartAdminLiveData.postValue(list)
             }
-            .addOnFailureListener {
-                Log.d("getCartAdmin", "Error getting cart: $it")
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("getCartAdmin", "Failed to read value.", error.toException())
             }
+
+        })
     }
 
-    fun addCart(food: Food, quantity: Int, intoMoney: Double){
+    fun addCartDetail(food: Food, quantity: Int, intoMoney: Double){
         val cart:HashMap<String, Any> = HashMap()
         cart["foodId"] = food.foodId.toString()
-        cart["adminId"] = food.adminId.toString()
         cart["foodName"] = food.foodName.toString()
         cart["price"] = food.price!!.toDouble()
         cart["image"] = food.image.toString()
         cart["quantity"] = quantity
         cart["intoMoney"] = intoMoney
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
-            .collection("cart").document(food.adminId.toString()).collection("cartDetail")
-            .add(cart)
-            .addOnSuccessListener { documentReference ->
-                checkAddFirebase.postValue(true)
-                Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+        cart["adminId"] = food.adminId.toString()
+        database.getReference("CartDetail").child(food.foodId.toString())
+            .setValue(cart)
+            .addOnSuccessListener {
+                Log.d(ContentValues.TAG, "addCartDetail Success")
             }
             .addOnFailureListener {e ->
                 Log.w(ContentValues.TAG, "Error adding document", e)
             }
     }
 
-    fun getCart(adminId: String){
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
-            .collection("cart").document(adminId).collection("cartDetail")
-            .get()
-            .addOnCompleteListener { task ->
-                if(task.isSuccessful && task.result != null){
-                    val listFoodCart = ArrayList<Cart>()
-                    for(document in task.result){
-                        val cartId = document.id
-                        val foodId = document.getString("foodId")
-                        val foodName = document.getString("foodName")
-                        val price = document.getDouble("price")
-                        val image = document.getString("image")
-                        val quantity = document.getLong("quantity")!!.toInt()
-                        val intoMoney = document.getDouble("intoMoney")
-                        val cart = Cart(
-                            cartId,
-                            foodId,
-                            foodName,
-                            price,
-                            quantity,
-                            image,
-                            intoMoney
-                        )
-                        listFoodCart.add(cart)
+    fun getCartDetail(adminId: String){
+        database.getReference("CartDetail").orderByChild("adminId").equalTo(adminId)
+            .addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val list = ArrayList<Cart>()
+                for(snap in snapshot.children){
+                    val cart = snap.getValue(Cart::class.java)
+                    if (cart != null) {
+                        list.add(cart)
                     }
-                    cartLiveData.postValue(listFoodCart)
                 }
+                cartLiveData.postValue(list)
             }
-            .addOnFailureListener {
-                Log.d("getCart", "Error getting cart: $it")
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("getCartDetail", "Failed to read value.", error.toException())
             }
+
+        })
     }
 
-    fun getIdCart(){
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid).collection("cart")
-            .get()
-            .addOnCompleteListener { task ->
-                if(task.isSuccessful && task.result != null){
-                    val listId = ArrayList<String>()
-                    for(document in task.result){
-                        val id = document.id
-                        listId.add(id)
-                    }
-                    cartIdLiveData.postValue(listId)
-                }
-            }
-            .addOnFailureListener {
-                Log.d("getFoodId", "Error getting cart: $it")
-            }
-    }
-
-    fun updateQuantity(cart: Cart, adminId: String){
+    fun updateQuantity(cart: Cart){
         val updateCart:HashMap<String, Any> = HashMap()
         updateCart["quantity"] = cart.quantity!!
         updateCart["intoMoney"] = cart.quantity!! * cart.price!!
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
-            .collection("cart").document(adminId).collection("cartDetail").document(cart.cartId.toString())
-            .update(updateCart)
+        database.getReference("CartDetail").child(cart.foodId.toString())
+            .updateChildren(updateCart)
             .addOnSuccessListener {
                 Log.d("Edit", "Quantity updated successfully!")
             }
@@ -173,84 +134,99 @@ class CartRepository(_application: Application) {
             }
     }
 
-    fun totalPrice(adminId: String){
-        var sum = 0.0
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
-            .collection("cart").document(adminId).collection("cartDetail")
-            .get()
-            .addOnCompleteListener {
-                if(it.isSuccessful && it.result != null){
-                    for(document in it.result){
-                        val intoMoney = document.getDouble("intoMoney")
-                        if (intoMoney != null) {
-                            sum += intoMoney
-                        }
-                        totalPriceLiveData.postValue(sum)
-                    }
-                }
-            }
-    }
-
     fun addOrder(order: Order){
+        val id = Random.nextInt(10000)
         val newOrder:HashMap<String, Any> = HashMap()
+        newOrder["orderId"] = id.toString()
         newOrder["userName"] = order.userName.toString()
         newOrder["phoneNumber"] = order.phoneNumber.toString()
+        newOrder["totalPrice"] = order.totalPrice!!.toDouble()
         newOrder["address"] = order.address.toString()
         newOrder["deliveryMethods"] = order.deliveryMethods.toString()
         newOrder["paymentMethods"] = order.paymentMethods.toString()
-        newOrder["totalPrice"] = order.totalPrice!!.toDouble()
         newOrder["describeOrder"] = order.describeOrder.toString()
         newOrder["orderStatus"] = order.orderStatus.toString()
+        newOrder["userId"] = order.userId.toString()
         newOrder["adminId"] = order.adminId.toString()
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
-            .collection("order").add(newOrder)
-            .addOnSuccessListener { documentReference ->
-                checkAddFirebase.postValue(true)
-                Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+        database.getReference("Orders").child(id.toString())
+            .setValue(newOrder)
+            .addOnCompleteListener {
+                Log.d(ContentValues.TAG, "Order success")
             }
             .addOnFailureListener {e ->
                 Log.w(ContentValues.TAG, "Error adding document", e)
             }
     }
 
-    fun getOrder(){
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid).collection("order")
-            .get()
-            .addOnCompleteListener { task ->
-                if(task.isSuccessful && task.result != null){
-                    val list = ArrayList<Order>()
-                    for(document in task.result){
-                        val orderId = document.id
-                        val userName = document.getString("userName")
-                        val phoneNumber = document.getString("phoneNumber")
-                        val totalPrice = document.getDouble("totalPrice")
-                        val address = document.getString("address")
-                        val deliveryMethods = document.getString("deliveryMethods")
-                        val paymentMethods = document.getString("paymentMethods")
-                        val describeOrder = document.getString("describeOrder")
-                        val orderStatus = document.getString("orderStatus")
-                        val adminId = document.getString("adminId")
-                        val order = Order(orderId, userName, phoneNumber, totalPrice, address, deliveryMethods, paymentMethods, describeOrder, orderStatus, adminId)
-                        list.add(order)
-                    }
-                    orderLiveData.postValue(list)
-                    Log.d("getOrder", list.toString())
-                }
+    fun updateOrder(orderId: String, orderStatus: String){
+        val newOrder:HashMap<String, Any> = HashMap()
+        newOrder["orderStatus"] = orderStatus
+        database.getReference("Orders").child(orderId)
+            .updateChildren(newOrder)
+            .addOnSuccessListener {
+                Toast.makeText(application, "Cập nhật đơn hàng thành công", Toast.LENGTH_LONG).show()
+                Log.d(ContentValues.TAG, "Update order status success")
             }
-            .addOnFailureListener {
-                Log.d("getOrder", "Error getting cart: $it")
+            .addOnFailureListener {e ->
+                Toast.makeText(application, "Cập nhật đơn hàng thất bại", Toast.LENGTH_LONG).show()
+                Log.w(ContentValues.TAG, "Error update document", e)
             }
     }
 
-    fun deleteCart(cartId: String){
-        firebaseFirestore.collection("users").document(auth.currentUser!!.uid)
-            .collection("cart").document(cartId)
-            .delete()
-            .addOnSuccessListener {
-                Log.d(ContentValues.TAG, "Delete cart successfully")
+    fun getOrder(id: String){
+        database.getReference("Orders").orderByChild("userId").equalTo(id)
+            .addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = ArrayList<Order>()
+                    for(itemSnap in snapshot.children){
+                        val order = itemSnap.getValue(Order::class.java)
+                        order?.let { list.add(it) }
+                    }
+                    orderLiveData.postValue(list)
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(ContentValues.TAG, "Failed to read order.", error.toException())
+                }
+
+            })
+    }
+
+    fun getOrderAdmin(id: String){
+        database.getReference("Orders").orderByChild("adminId").equalTo(id)
+            .addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = ArrayList<Order>()
+                    for(itemSnap in snapshot.children){
+                        val order = itemSnap.getValue(Order::class.java)
+                        order?.let { list.add(it) }
+                    }
+                    orderLiveData.postValue(list)
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(ContentValues.TAG, "Failed to read order.", error.toException())
+                }
+
+            })
+    }
+
+    fun deleteCartAdmin(cartAdminId: String){
+        database.getReference("CartAdmin").child(cartAdminId)
+            .removeValue()
+            .addOnCompleteListener {
+                Log.d("deleteCartAdmin", "DocumentSnapshot successfully deleted!")
             }
             .addOnFailureListener {
-                Log.d(ContentValues.TAG, "Delete cart fail")
+                Log.d("deleteCartAdmin", "DocumentSnapshot fail deleted!")
+            }
+    }
+
+    fun deleteCartDetail(cartDetailId: String){
+        database.getReference("CartDetail").child(cartDetailId)
+            .removeValue()
+            .addOnCompleteListener {
+                Log.d("deleteCartDetail", "DocumentSnapshot successfully deleted!")
+            }
+            .addOnFailureListener {
             }
     }
 
