@@ -93,4 +93,6 @@
     <string name="cancel_order">Hủy đơn hàng</string>
     <string name="time">15 phút</string>
     <string name="rating_number">5.0</string>
+    <string name="empty_confirm_pass">Không được để trống nhập lại mật khẩu</string>
+    <string name="isEmpty">Không được để trống!</string>
 </resources>

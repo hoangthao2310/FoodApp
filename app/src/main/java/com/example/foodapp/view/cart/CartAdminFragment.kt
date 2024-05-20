@@ -14,16 +14,18 @@ import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentCartAdminBinding
 import com.example.foodapp.model.CartAdmin
 import com.example.foodapp.viewmodel.CartViewModel
+import com.google.firebase.auth.FirebaseUser
 
 class CartAdminFragment : BaseFragment<FragmentCartAdminBinding>() {
     private lateinit var cartViewModel: CartViewModel
     private lateinit var cartAdminAdapter: CartAdminAdapter
+    private lateinit var firebaseUser: FirebaseUser
     override fun getLayout(container: ViewGroup?): FragmentCartAdminBinding =
         FragmentCartAdminBinding.inflate(layoutInflater, container, false)
     override fun initViews() {
         cartViewModel = ViewModelProvider(this)[CartViewModel::class.java]
-
-        cartViewModel.getCartAdmin()
+        firebaseUser = data as FirebaseUser
+        cartViewModel.getCartAdmin(firebaseUser.uid)
         cartViewModel.getCartAdmin.observe(viewLifecycleOwner){list ->
             val onItemClickListener = object : OnItemClickListener{
                 override fun onItemClick(data: Any?) {

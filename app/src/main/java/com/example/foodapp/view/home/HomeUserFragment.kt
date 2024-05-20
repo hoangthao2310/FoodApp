@@ -40,6 +40,10 @@ class HomeUserFragment : BaseFragment<FragmentHomeUserBinding>() {
             binding.tvUserName.text = it?.userName
         }
 
+        binding.btnSearch.setOnClickListener {
+            callback.showFragment(HomeUserFragment::class.java, SearchFragment::class.java, 0, 0, data, true)
+        }
+
         binding.btnProfile.setOnClickListener {
             callback.showFragment(HomeUserFragment::class.java, ProfileFragment::class.java, 0, 0, data, true)
         }

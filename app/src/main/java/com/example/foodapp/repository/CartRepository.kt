@@ -45,12 +45,14 @@ class CartRepository(_application: Application) {
     }
 
     fun addCartAdmin(adminId: String, userName: String, foodName: String){
+        val id = adminId + auth.currentUser?.uid
         val addNew: HashMap<String, Any> = HashMap()
+        addNew["cartAdminId"] = id
         addNew["adminId"] = adminId
         addNew["userName"] = userName
         addNew["foodName"] = foodName
         addNew["userId"] = auth.currentUser!!.uid
-        database.getReference("CartAdmin").child(adminId)
+        database.getReference("CartAdmin").child(id)
             .setValue(addNew)
             .addOnSuccessListener {
                 Log.d(ContentValues.TAG, "addCartAdmin Success")
@@ -60,8 +62,9 @@ class CartRepository(_application: Application) {
             }
     }
 
-    fun getCartAdmin(){
-        database.getReference("CartAdmin").addValueEventListener(object : ValueEventListener {
+    fun getCartAdmin(id: String){
+        database.getReference("CartAdmin").orderByChild("userId").equalTo(id)
+            .addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = ArrayList<CartAdmin>()
                 for(snap in snapshot.children){
@@ -89,6 +92,7 @@ class CartRepository(_application: Application) {
         cart["quantity"] = quantity
         cart["intoMoney"] = intoMoney
         cart["adminId"] = food.adminId.toString()
+        cart["cartAdminId"] = food.adminId + auth.currentUser?.uid
         database.getReference("CartDetail").child(food.foodId.toString())
             .setValue(cart)
             .addOnSuccessListener {
@@ -99,8 +103,8 @@ class CartRepository(_application: Application) {
             }
     }
 
-    fun getCartDetail(adminId: String){
-        database.getReference("CartDetail").orderByChild("adminId").equalTo(adminId)
+    fun getCartDetail(cartAdminId: String){
+        database.getReference("CartDetail").orderByChild("cartAdminId").equalTo(cartAdminId)
             .addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = ArrayList<Cart>()

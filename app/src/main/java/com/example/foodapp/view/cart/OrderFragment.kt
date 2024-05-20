@@ -40,19 +40,19 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
             binding.tvPhoneNumber.text = user?.contactPhoneNumber
             binding.tvAddress.text = user?.address
         }
+
         binding.btnSelectAddressOrder.setOnClickListener {
             callback.showFragment(OrderFragment::class.java, LocationOrderFragment::class.java, 0, 0, cartAdmin,true)
         }
 
         cartViewModel = ViewModelProvider(this)[CartViewModel::class.java]
-        cartViewModel.getCartDetail(cartAdmin.adminId.toString())
+        cartViewModel.getCartDetail(cartAdmin.cartAdminId.toString())
         cartViewModel.getCartFirebase.observe(viewLifecycleOwner){
             orderAdapter = OrderAdapter(it)
             binding.rcvOrder.adapter = orderAdapter
             binding.proBarOrder.visibility = View.INVISIBLE
 
             for(cart in it){
-                describeOrder += cart.foodName + ": Giá: " + cart.price + ", Số lượng: " + cart.quantity + " "
                 totalPrice = totalPrice!! + cart.intoMoney!!
             }
             binding.tvTotalFood.text = totalPrice.toString() + "đ"
@@ -80,6 +80,10 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
         }
 
         binding.btnConfirmOrder.setOnClickListener {
+            if(binding.tvUserName.text.isEmpty() || binding.tvPhoneNumber.text.isEmpty() || binding.tvAddress.text.isEmpty()){
+                binding.tvUserName.error = "Vui lòng chọn thông tin nhận hàng!"
+            }
+
             if(binding.radFastDelivery.isChecked){
                 delivery = getString(R.string.fast_delivery)
             }else if(binding.radExpressDelivery.isChecked){
@@ -101,33 +105,38 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
                 accountViewModel.getUser.observe(viewLifecycleOwner){user ->
                     accountViewModel.getFirebaseUser(user?.email.toString(), user?.password.toString())
                     accountViewModel.getUserData.observe(viewLifecycleOwner){firebaseUser ->
-                        val order = Order(
-                            userName = binding.tvUserName.text.toString(),
-                            phoneNumber = binding.tvPhoneNumber.text.toString(),
-                            totalPrice = total,
-                            address = binding.tvAddress.text.toString(),
-                            deliveryMethods = delivery,
-                            paymentMethods = payment,
-                            describeOrder = describeOrder,
-                            orderStatus = "Chờ xác nhận",
-                            userId = firebaseUser.uid,
-                            adminId = cartAdmin.adminId
-                        )
-                        loading()
-                        cartViewModel.addOrder(order)
                         cartViewModel.getCartDetail(cartAdmin.adminId.toString())
                         cartViewModel.getCartFirebase.observe(viewLifecycleOwner){
+                            for(cart in it){
+                                describeOrder += cart.foodName + ": Giá: " + cart.price + ", Số lượng: " + cart.quantity + " "
+                            }
+
+                            val order = Order(
+                                userName = binding.tvUserName.text.toString(),
+                                phoneNumber = binding.tvPhoneNumber.text.toString(),
+                                totalPrice = total,
+                                address = binding.tvAddress.text.toString(),
+                                deliveryMethods = delivery,
+                                paymentMethods = payment,
+                                describeOrder = describeOrder,
+                                orderStatus = "Chờ xác nhận",
+                                userId = firebaseUser.uid,
+                                adminId = cartAdmin.adminId
+                            )
+                            loading()
+                            cartViewModel.addOrder(order)
+
                             for(cart in it){
                                 cartViewModel.deleteCartDetail(cart.foodId.toString())
                             }
                         }
-                        cartViewModel.deleteCartAdmin(cartAdmin.adminId.toString())
+                        cartViewModel.deleteCartAdmin(cartAdmin.cartAdminId.toString())
                         notify("Đặt hàng thành công")
                         callback.showFragment(OrderFragment::class.java, PurchaseOrderFragment::class.java, 0, 0, firebaseUser,false)
+                        }
                     }
                 }
 
-            }
         }
 
         binding.btnBack.setOnClickListener {

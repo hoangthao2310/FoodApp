@@ -59,7 +59,9 @@ class AddFoodFragment : BaseFragment<FragmentAddFoodBinding>() {
                     categoryName = listCategoryName[position]
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    categoryName = ""
+                }
             }
         }
 
@@ -68,7 +70,7 @@ class AddFoodFragment : BaseFragment<FragmentAddFoodBinding>() {
         }
 
         binding.btnAddNewFood.setOnClickListener {
-            if (categoryName != null) {
+            if (categoryName != "") {
                 bestFood = binding.cbBestFood.isChecked
                 foodViewModel.category()
                 foodViewModel.getCategory.observe(viewLifecycleOwner) { listCategory ->

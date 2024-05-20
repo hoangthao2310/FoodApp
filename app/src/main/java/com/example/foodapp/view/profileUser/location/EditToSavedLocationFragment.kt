@@ -3,6 +3,7 @@ package com.example.foodapp.view.profileUser.location
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import com.example.foodapp.R
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentEditToSavedLocationBinding
 import com.example.foodapp.model.Location
@@ -30,38 +31,39 @@ class EditToSavedLocationFragment : BaseFragment<FragmentEditToSavedLocationBind
             val dialog = DeleteDialog(object: OnClickListener {
                 override fun onClick() {
                     accountViewModel.deleteLocation(location.locationId.toString())
-                    callback.backToPrevious()
+                    parentFragmentManager.popBackStack()
                 }
             })
             dialog.show(requireActivity().supportFragmentManager, "delete_dialog")
         }
 
         binding.btnSaveEditLocation.setOnClickListener {
-            val newLocation = Location(
-                addressName = binding.edtAddressName.text.toString(),
-                address = binding.edtAddress.text.toString(),
-                note = binding.edtNote.text.toString(),
-                contactPersonName = binding.edtContactPersonName.text.toString(),
-                contactPhoneNumber = binding.edtPhoneNumber.text.toString()
-            )
-            loading(true)
-            if(binding.cbChooseDefault.isChecked){
-                accountViewModel.updateInfoUserOrder(newLocation)
-            }
-            accountViewModel.updateLocation(location.locationId.toString(),newLocation)
-            accountViewModel.getLocationStatus.observe(viewLifecycleOwner){
-                if(it){
-                    loading(false)
-                    callback.showFragment(
-                        EditToSavedLocationFragment::class.java,
-                        SavedLocationFragment::class.java,
-                        0,
-                        0,
-                        null,
-                        false
-                    )
-                    notify("Lưu thay đổi thành công")
+            if(binding.edtAddressName.text.isEmpty()){
+                binding.edtAddressName.error = getString(R.string.isEmpty)
+            }else if(binding.edtAddress.text.isEmpty()){
+                binding.edtAddress.error = getString(R.string.isEmpty)
+            }else if(binding.edtNote.text.isEmpty()){
+                binding.edtNote.error = getString(R.string.isEmpty)
+            }else if(binding.edtContactPersonName.text.isEmpty()){
+                binding.edtContactPersonName.error = getString(R.string.isEmpty)
+            }else if(binding.edtPhoneNumber.text.isEmpty()){
+                binding.edtPhoneNumber.error = getString(R.string.isEmpty)
+            }else{
+                val newLocation = Location(
+                    addressName = binding.edtAddressName.text.toString(),
+                    address = binding.edtAddress.text.toString(),
+                    note = binding.edtNote.text.toString(),
+                    contactPersonName = binding.edtContactPersonName.text.toString(),
+                    contactPhoneNumber = binding.edtPhoneNumber.text.toString()
+                )
+                loading(true)
+                if(binding.cbChooseDefault.isChecked){
+                    accountViewModel.updateInfoUserOrder(newLocation)
                 }
+                accountViewModel.updateLocation(location.locationId.toString(),newLocation)
+                loading(false)
+                parentFragmentManager.popBackStack()
+                notify("Lưu thay đổi thành công")
             }
         }
         binding.btnBack.setOnClickListener {

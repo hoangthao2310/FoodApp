@@ -71,37 +71,24 @@
                     android:layout_marginEnd="16dp"
                     android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
+                    <FrameLayout
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:orientation="horizontal"
                         android:layout_weight="1"
-                        android:background="@drawable/grey_background"
-                        android:layout_gravity="center">
+                        android:animateLayoutChanges="true">
 
-                        <ImageView
-                            android:id="@+id/imageView2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginStart="4dp"
-                            android:src="@drawable/search"/>
-
-                        <EditText
-                            android:id="@+id/edtSearch"
-                            android:layout_width="wrap_content"
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btnSearch"
+                            style="@android:style/Widget.Button"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="1"
                             android:background="@drawable/grey_background"
-                            android:ems="10"
-                            android:hint="@string/search"
-                            android:inputType="text"
-                            android:padding="8dp"
-                            android:textAlignment="center"
-                            android:textColor="@color/grey"
-                            android:textColorHint="@color/grey"
-                            android:textSize="20sp" />
-                    </LinearLayout>
+                            android:text="@string/search"
+                            android:textColor="@color/red_pink"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                    </FrameLayout>
 
                     <ImageView
                         android:id="@+id/btnCart"

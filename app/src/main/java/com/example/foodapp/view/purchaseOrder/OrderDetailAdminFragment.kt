@@ -35,12 +35,14 @@ class OrderDetailAdminFragment : BaseFragment<FragmentOrderDetailAdminBinding>()
             confirmed -> {
                 binding.tvOrderStatus.text = order.orderStatus
                 binding.tvOrderStatus.setTextColor(Color.GREEN)
-                binding.btnOrderStatus.visibility = View.INVISIBLE
+                binding.btnConfirmOrder.visibility = View.INVISIBLE
+                binding.btnCancelOrder.visibility = View.INVISIBLE
             }
             orderCanceled -> {
                 binding.tvOrderStatus.text = order.orderStatus
                 binding.tvOrderStatus.setTextColor(Color.RED)
-                binding.btnOrderStatus.visibility = View.INVISIBLE
+                binding.btnConfirmOrder.visibility = View.INVISIBLE
+                binding.btnCancelOrder.visibility = View.INVISIBLE
             }
             unconfirmed -> {
                 binding.tvOrderStatus.text = order.orderStatus
@@ -51,9 +53,14 @@ class OrderDetailAdminFragment : BaseFragment<FragmentOrderDetailAdminBinding>()
 
         when(binding.tvOrderStatus.text){
             unconfirmed -> {
-                binding.btnOrderStatus.setOnClickListener {
+                binding.btnConfirmOrder.setOnClickListener {
                     cartViewModel.updateOrder(order.orderId.toString(), confirmed)
                     binding.progressBar.visibility = View.VISIBLE
+                    parentFragmentManager.popBackStack()
+                }
+                binding.btnCancelOrder.setOnClickListener {
+                    cartViewModel.updateOrder(order.orderId.toString(), orderCanceled)
+                    binding.progressBar2.visibility = View.VISIBLE
                     parentFragmentManager.popBackStack()
                 }
             }

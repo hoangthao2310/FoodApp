@@ -16,8 +16,8 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     private var location: MutableLiveData<ArrayList<Location>>
     private var userFirebase: MutableLiveData<FirebaseUser>
     private var logStatus: MutableLiveData<Boolean>
-    private var locationStatus: MutableLiveData<Boolean>
     private var favouriteFood: MutableLiveData<ArrayList<Food>>
+    private var listUser: MutableLiveData<ArrayList<User>>
 
     val getUserData: MutableLiveData<FirebaseUser>
         get() = userFirebase
@@ -27,18 +27,18 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
         get() = location
     val getLogStatus: MutableLiveData<Boolean>
         get() = logStatus
-    val getLocationStatus: MutableLiveData<Boolean>
-        get() = locationStatus
     val getFavouriteFood: MutableLiveData<ArrayList<Food>>
         get() = favouriteFood
+    val getListUser: MutableLiveData<ArrayList<User>>
+        get() = listUser
     init {
         accountRepository = AccountRepository(application)
         user = accountRepository.getUser
         userFirebase = accountRepository.getFirebaseUser
         logStatus = accountRepository.isCheckLog
         location = accountRepository.getUserLocation
-        locationStatus = accountRepository.isCheckLocation
         favouriteFood = accountRepository.getFavouriteFood
+        listUser = accountRepository.getListUserData
     }
 
     fun register(email: String, password: String, name: String, checkAdmin: Boolean){
@@ -47,6 +47,9 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
 
     fun login(email: String, password: String, isRemember: Boolean){
         accountRepository.login(email, password, isRemember)
+    }
+    fun getListUser(){
+        accountRepository.getListUser()
     }
     fun getFirebaseUser(email: String, password: String){
         accountRepository.getFirebaseUser(email, password)
@@ -63,6 +66,9 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     fun updateProfileUser(user: User){
         accountRepository.updateProfileUser(user)
     }
+    fun updatePassword(userId: String, password: String){
+        accountRepository.updatePassword(userId, password)
+    }
     fun updateInfoUserOrder(location: Location){
         accountRepository.updateInfoUserOrder(location)
     }
@@ -72,8 +78,8 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     fun addLocation(location: Location){
         accountRepository.addLocation(location)
     }
-    fun getLocation(){
-        accountRepository.getLocation()
+    fun getLocation(userId: String){
+        accountRepository.getLocation(userId)
     }
     fun updateLocation(locationId: String, location: Location){
         accountRepository.updateLocation(locationId, location)

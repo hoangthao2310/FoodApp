@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.foodapp.OnItemClickListener
 import com.example.foodapp.databinding.ItemInfoUserOrderBinding
 import com.example.foodapp.model.Location
+import java.lang.ref.WeakReference
 
 class InfoUserAdapter(
     var listLocation: ArrayList<Location>,
@@ -13,6 +14,7 @@ class InfoUserAdapter(
 ): RecyclerView.Adapter<InfoUserAdapter.InfoUserViewHolder>() {
 
     inner class InfoUserViewHolder(private val binding: ItemInfoUserOrderBinding): RecyclerView.ViewHolder(binding.root){
+        private val view = WeakReference(itemView)
         fun bind(location: Location){
             binding.tvAddressName.text = location.addressName
             binding.tvAddress.text = location.address
@@ -23,6 +25,19 @@ class InfoUserAdapter(
         init {
             binding.layoutItemLocation.setOnClickListener {
                 itemClick.onItemClick(listLocation[adapterPosition])
+            }
+
+            view.get()?.let {
+                it.setOnClickListener{
+                    //click item to reset swiped position
+                    if(view.get()?.scrollX != 0){
+                        view.get()?.scrollTo(0, 0)
+                    }
+                }
+            }
+
+            binding.tvDelete.setOnClickListener {
+                itemClick.onItemDeleteClick(listLocation[adapterPosition])
             }
         }
     }
@@ -41,5 +56,9 @@ class InfoUserAdapter(
 
     override fun getItemCount(): Int {
         return listLocation.size
+    }
+    fun removeItem(position: Int) {
+        listLocation.removeAt(position)
+        notifyItemRemoved(position)
     }
 }

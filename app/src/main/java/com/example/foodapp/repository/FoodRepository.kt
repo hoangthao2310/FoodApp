@@ -102,6 +102,28 @@ class FoodRepository(_application: Application) {
         })
     }
 
+    fun getAllFood(){
+        database.getReference("Foods")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = ArrayList<Food>()
+                    for(snap in snapshot.children){
+                        val food = snap.getValue(Food::class.java)
+                        if (food != null) {
+                            list.add(food)
+                        }
+                    }
+                    listFoodLiveData.postValue(list)
+                    Log.d("Food", list.toString())
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("Food", "Failed to read value.", error.toException())
+                }
+
+            })
+    }
+
     fun foodAdmin(id: String){
         database.getReference("Foods").orderByChild("adminId").equalTo(id)
             .addValueEventListener(object : ValueEventListener {

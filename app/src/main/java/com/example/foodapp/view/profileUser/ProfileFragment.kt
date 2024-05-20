@@ -8,6 +8,7 @@ import com.example.foodapp.databinding.FragmentProfileBinding
 import com.example.foodapp.view.home.HomeUserFragment
 import com.example.foodapp.view.log.LoginFragment
 import com.example.foodapp.view.profileUser.location.SavedLocationFragment
+import com.example.foodapp.view.purchaseOrder.PurchaseOrderFragment
 import com.example.foodapp.viewmodel.AccountViewModel
 import com.google.firebase.auth.FirebaseUser
 
@@ -42,7 +43,9 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         binding.btnHome.setOnClickListener {
             callback.showFragment(ProfileFragment::class.java, HomeUserFragment::class.java, 0, 0, data, true)
         }
-
+        binding.btnPurchaseOrder.setOnClickListener {
+            callback.showFragment(ProfileFragment::class.java, PurchaseOrderFragment::class.java, 0, 0, data, true)
+        }
 
         binding.btnLogout.setOnClickListener {
             accountViewModel.logout()

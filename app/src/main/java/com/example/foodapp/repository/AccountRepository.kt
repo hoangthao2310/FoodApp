@@ -20,13 +20,14 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlin.random.Random
 
 class AccountRepository (_application: Application){
     private var firebaseUser: MutableLiveData<FirebaseUser>
     private var userLiveData: MutableLiveData<User?>
+    private var listUserData: MutableLiveData<ArrayList<User>>
     private var locationLiveData: MutableLiveData<ArrayList<Location>>
     private var userLog: MutableLiveData<Boolean>
-    private var checkLocation: MutableLiveData<Boolean>
     private var favouriteFoodLiveData: MutableLiveData<ArrayList<Food>>
 
     private var application: Application
@@ -47,18 +48,18 @@ class AccountRepository (_application: Application){
     val isCheckLog: MutableLiveData<Boolean>
         get() = userLog
 
-    val isCheckLocation: MutableLiveData<Boolean>
-        get() = checkLocation
     val getFavouriteFood: MutableLiveData<ArrayList<Food>>
         get() = favouriteFoodLiveData
+    val getListUserData: MutableLiveData<ArrayList<User>>
+        get() = listUserData
     init {
         application = _application
         firebaseUser = MutableLiveData<FirebaseUser>()
         userLiveData = MutableLiveData<User?>()
         locationLiveData = MutableLiveData<ArrayList<Location>>()
         userLog = MutableLiveData<Boolean>(false)
-        checkLocation = MutableLiveData<Boolean>(false)
         favouriteFoodLiveData = MutableLiveData<ArrayList<Food>>()
+        listUserData = MutableLiveData<ArrayList<User>>()
 
         auth = FirebaseAuth.getInstance()
         if(auth.currentUser != null){
@@ -111,6 +112,24 @@ class AccountRepository (_application: Application){
             }
         }
     }
+
+    fun getListUser(){
+        database.getReference("Users")
+            .addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = ArrayList<User>()
+                    for(itemSnap in snapshot.children){
+                        itemSnap.getValue(User::class.java)?.let { list.add(it) }
+                    }
+                    listUserData.postValue(list)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("getListUser", "Failed to read value.", error.toException())
+                }
+
+            })
+    }
     fun getFirebaseUser(email: String, password: String){
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if(it.isSuccessful){
@@ -120,7 +139,8 @@ class AccountRepository (_application: Application){
     }
 
     fun getUserDetail(userID: String){
-        database.getReference("Users").child(userID).addValueEventListener(object : ValueEventListener{
+        database.getReference("Users").child(userID)
+            .addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val user = snapshot.getValue(User::class.java)
                 userLiveData.postValue(user)
@@ -179,6 +199,18 @@ class AccountRepository (_application: Application){
                 Toast.makeText(application, "cập nhật không thành công", Toast.LENGTH_LONG).show()
             }
     }
+    fun updatePassword(userID: String, password: String){
+        val update:HashMap<String, Any> = HashMap()
+        update["password"] = password
+        database.getReference("Users").child(userID)
+            .updateChildren(update)
+            .addOnCompleteListener {
+                Toast.makeText(application, "Đổi mật khẩu thành công", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(application, "Đổi mật khẩu không thành công", Toast.LENGTH_LONG).show()
+            }
+    }
 
     fun updateInfoUserOrder(location: Location){
         val newLocation: HashMap<String, Any> = HashMap()
@@ -189,7 +221,6 @@ class AccountRepository (_application: Application){
         database.getReference("Users").child(auth.currentUser?.uid.toString())
             .updateChildren(newLocation)
             .addOnSuccessListener {
-                checkLocation.postValue(true)
                 Log.d(ContentValues.TAG, "Location updated successfully!")
             }
             .addOnFailureListener {e ->
@@ -199,17 +230,18 @@ class AccountRepository (_application: Application){
 
 
     fun addLocation(location: Location){
+        val id = Random.nextInt(10000)
         val newLocation: HashMap<String, Any> = HashMap()
+        newLocation["locationId"] = id.toString()
         newLocation["addressName"] = location.addressName.toString()
         newLocation["address"] = location.address.toString()
         newLocation["note"] = location.note.toString()
         newLocation["contactPersonName"] = location.contactPersonName.toString()
         newLocation["contactPhoneNumber"] = location.contactPhoneNumber.toString()
         newLocation["userId"] = location.userId.toString()
-        database.getReference("Location")
+        database.getReference("Location").child(id.toString())
             .setValue(newLocation)
             .addOnSuccessListener {
-                checkLocation.postValue(true)
                 Log.d(ContentValues.TAG, "addLocation Successful")
             }
             .addOnFailureListener {e ->
@@ -217,8 +249,8 @@ class AccountRepository (_application: Application){
             }
     }
 
-    fun getLocation(){
-        database.getReference("Location")
+    fun getLocation(userID: String){
+        database.getReference("Location").orderByChild("userId").equalTo(userID)
             .addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val list = ArrayList<Location>()
@@ -245,7 +277,6 @@ class AccountRepository (_application: Application){
         database.getReference("Location").child(locationId)
             .updateChildren(newLocation)
             .addOnSuccessListener {
-                checkLocation.postValue(true)
                 Log.d(ContentValues.TAG, "Location updated successfully!")
             }
             .addOnFailureListener {e ->

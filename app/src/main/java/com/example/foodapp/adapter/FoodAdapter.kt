@@ -1,5 +1,6 @@
 package com.example.foodapp.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,13 @@ class FoodAdapter(
     private var listFood: List<Food>,
     private val itemClick: OnItemClickListener
 ) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>(){
+    @SuppressLint("NotifyDataSetChanged")
+    fun setFilteredList(listFood: List<Food>){
+        this.listFood = listFood
+        notifyDataSetChanged()
+    }
     inner class FoodViewHolder(private val binding: ItemFoodBinding): RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bind(food: Food){
             binding.tvFoodName.text = food.foodName
             binding.tvPrice.text = "${food.price}đ"

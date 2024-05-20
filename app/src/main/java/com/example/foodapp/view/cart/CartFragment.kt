@@ -30,7 +30,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
         cartAdmin = data as CartAdmin
 
         binding.layoutButtonIntoMoney.visibility = View.INVISIBLE
-        cartViewModel.getCartDetail(cartAdmin.adminId.toString())
+        cartViewModel.getCartDetail(cartAdmin.cartAdminId.toString())
         cartViewModel.getCartFirebase.observe(viewLifecycleOwner){listItemCart ->
             if(listItemCart != null){
                 binding.layoutButtonIntoMoney.visibility = View.VISIBLE

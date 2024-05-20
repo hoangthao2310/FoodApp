@@ -1,7 +1,6 @@
 package com.example.foodapp.view.food
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -58,6 +57,7 @@ class FoodDetailFragment : BaseFragment<FragmentFoodDetailBinding>() {
                 cartViewModel.addCartAdmin(food.adminId.toString(), user?.userName.toString(), list.toString())
             }
             cartViewModel.addCartDetail(food, 1, food.price!!)
+            notify("Đã thêm vào giỏ hàng")
         }
 
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]

@@ -33,6 +33,9 @@ class FoodViewModel(application: Application)  : AndroidViewModel(application){
     fun food(categoryId: String?){
         foodRepository.food(categoryId)
     }
+    fun getAllFood(){
+        foodRepository.getAllFood()
+    }
 
     fun foodAdmin(id: String){
         foodRepository.foodAdmin(id)

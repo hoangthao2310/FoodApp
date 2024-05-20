@@ -32,15 +32,15 @@ class CartViewModel(application: Application): AndroidViewModel(application) {
     fun addCartAdmin(adminId: String, userName: String, foodName: String){
         cartRepository.addCartAdmin(adminId, userName, foodName)
     }
-    fun getCartAdmin(){
-        cartRepository.getCartAdmin()
+    fun getCartAdmin(userId: String){
+        cartRepository.getCartAdmin(userId)
     }
 
     fun addCartDetail(food: Food, quantity: Int, intoMoney: Double){
         cartRepository.addCartDetail(food, quantity, intoMoney)
     }
-    fun getCartDetail(adminId: String){
-        cartRepository.getCartDetail(adminId)
+    fun getCartDetail(cartAdminId: String){
+        cartRepository.getCartDetail(cartAdminId)
     }
     fun updateQuantity(cart: Cart){
         cartRepository.updateQuantity(cart)

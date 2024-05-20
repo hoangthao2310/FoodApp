@@ -8,9 +8,11 @@ import com.example.foodapp.adapter.LocationAdapter
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentSavedLocationBinding
 import com.example.foodapp.model.Location
+import com.example.foodapp.view.profileUser.ProfileFragment
 import com.example.foodapp.view.profileUser.location.dialog.DeleteDialog
 import com.example.foodapp.view.profileUser.location.dialog.OnClickListener
 import com.example.foodapp.viewmodel.AccountViewModel
+import com.google.firebase.auth.FirebaseUser
 
 class SavedLocationFragment : BaseFragment<FragmentSavedLocationBinding>() {
     private lateinit var accountViewModel: AccountViewModel
@@ -20,7 +22,16 @@ class SavedLocationFragment : BaseFragment<FragmentSavedLocationBinding>() {
 
     override fun initViews() {
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
-        accountViewModel.getLocation()
+        accountViewModel.getUserDetail()
+        accountViewModel.getUser.observe(viewLifecycleOwner){user ->
+            accountViewModel.getFirebaseUser(user?.email.toString(), user?.password.toString())
+            accountViewModel.getUserData.observe(viewLifecycleOwner){firebaseUser ->
+                binding.btnBack.setOnClickListener {
+                    callback.showFragment(SavedLocationFragment::class.java, ProfileFragment::class.java, 0, 0, firebaseUser, true)
+                }
+            }
+            accountViewModel.getLocation(user?.userId.toString())
+        }
         accountViewModel.getLocation.observe(viewLifecycleOwner){ listLocation ->
             if(listLocation != null){
                 val onItemClickListener = object : OnItemClickListener{
@@ -57,10 +68,6 @@ class SavedLocationFragment : BaseFragment<FragmentSavedLocationBinding>() {
         }
         binding.layoutAddAddress.setOnClickListener {
             callback.showFragment(SavedLocationFragment::class.java, MapsFragment::class.java, 0, 0, data, true)
-        }
-
-        binding.btnBack.setOnClickListener {
-            callback.backToPrevious()
         }
     }
 
