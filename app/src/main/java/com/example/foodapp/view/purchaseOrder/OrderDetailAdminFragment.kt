@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import com.example.foodapp.adapter.FoodOrderedAdapter
+import com.example.foodapp.adapter.OrderAdapter
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentOrderDetailAdminBinding
 import com.example.foodapp.model.Order
@@ -12,6 +14,7 @@ import com.example.foodapp.viewmodel.CartViewModel
 
 class OrderDetailAdminFragment : BaseFragment<FragmentOrderDetailAdminBinding>() {
     private lateinit var cartViewModel: CartViewModel
+    private lateinit var foodOrderedAdapter: FoodOrderedAdapter
     private lateinit var order: Order
 
     private val unconfirmed: String = "Chưa xác nhận"
@@ -24,6 +27,13 @@ class OrderDetailAdminFragment : BaseFragment<FragmentOrderDetailAdminBinding>()
     override fun initViews() {
         cartViewModel = ViewModelProvider(this)[CartViewModel::class.java]
         order = data as Order
+
+        cartViewModel.getFoodOrdered(order.orderId.toString())
+        cartViewModel.getFoodOrdered.observe(viewLifecycleOwner){
+            foodOrderedAdapter = FoodOrderedAdapter(it)
+            binding.rcvOrder.adapter = foodOrderedAdapter
+            binding.proBarOrder.visibility = View.INVISIBLE
+        }
 
         binding.tvUserName.text = order.userName
         binding.tvPhoneNumber.text = order.phoneNumber

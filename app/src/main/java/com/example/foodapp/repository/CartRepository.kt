@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.foodapp.model.Cart
 import com.example.foodapp.model.CartAdmin
 import com.example.foodapp.model.Food
+import com.example.foodapp.model.FoodOrdered
 import com.example.foodapp.model.Order
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -21,6 +22,7 @@ class CartRepository(_application: Application) {
     private var cartAdminLiveData: MutableLiveData<ArrayList<CartAdmin>>
     private var cartIdLiveData: MutableLiveData<ArrayList<String>>
     private var orderLiveData: MutableLiveData<ArrayList<Order>>
+    private var foodOrderedLiveData: MutableLiveData<ArrayList<FoodOrdered>>
 
     private val application: Application
     private val auth: FirebaseAuth
@@ -34,6 +36,8 @@ class CartRepository(_application: Application) {
         get() = orderLiveData
     val getCartAdminFirebase: MutableLiveData<ArrayList<CartAdmin>>
         get() = cartAdminLiveData
+    val getFoodOrdered: MutableLiveData<ArrayList<FoodOrdered>>
+        get() = foodOrderedLiveData
     init {
         application = _application
         auth = FirebaseAuth.getInstance()
@@ -42,6 +46,7 @@ class CartRepository(_application: Application) {
         cartLiveData = MutableLiveData<ArrayList<Cart>>()
         orderLiveData = MutableLiveData<ArrayList<Order>>()
         cartAdminLiveData = MutableLiveData<ArrayList<CartAdmin>>()
+        foodOrderedLiveData = MutableLiveData<ArrayList<FoodOrdered>>()
     }
 
     fun addCartAdmin(adminId: String, userName: String, foodName: String){
@@ -139,9 +144,8 @@ class CartRepository(_application: Application) {
     }
 
     fun addOrder(order: Order){
-        val id = Random.nextInt(10000)
         val newOrder:HashMap<String, Any> = HashMap()
-        newOrder["orderId"] = id.toString()
+        newOrder["orderId"] = order.orderId.toString()
         newOrder["userName"] = order.userName.toString()
         newOrder["phoneNumber"] = order.phoneNumber.toString()
         newOrder["totalPrice"] = order.totalPrice!!.toDouble()
@@ -152,7 +156,7 @@ class CartRepository(_application: Application) {
         newOrder["orderStatus"] = order.orderStatus.toString()
         newOrder["userId"] = order.userId.toString()
         newOrder["adminId"] = order.adminId.toString()
-        database.getReference("Orders").child(id.toString())
+        database.getReference("Orders").child(order.orderId.toString())
             .setValue(newOrder)
             .addOnCompleteListener {
                 Log.d(ContentValues.TAG, "Order success")
@@ -160,6 +164,41 @@ class CartRepository(_application: Application) {
             .addOnFailureListener {e ->
                 Log.w(ContentValues.TAG, "Error adding document", e)
             }
+    }
+    fun addFoodOrdered(foodOrdered: FoodOrdered){
+        val id = Random.nextInt(10000)
+        val newOrder:HashMap<String, Any> = HashMap()
+        newOrder["foodOrderedId"] = id
+        newOrder["orderId"] = foodOrdered.orderId.toString()
+        newOrder["foodName"] = foodOrdered.foodName.toString()
+        newOrder["price"] = foodOrdered.price!!.toDouble()
+        newOrder["quantity"] = foodOrdered.quantity!!.toDouble()
+        database.getReference("FoodOrdered").child(id.toString())
+            .setValue(newOrder)
+            .addOnCompleteListener {
+                Log.d(ContentValues.TAG, "addFoodOrdered success")
+            }
+            .addOnFailureListener {e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
+    fun getFoodOrdered(orderId: String){
+        database.getReference("FoodOrdered").orderByChild("orderId").equalTo(orderId)
+            .addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = ArrayList<FoodOrdered>()
+                    for(itemSnap in snapshot.children){
+                        val order = itemSnap.getValue(FoodOrdered::class.java)
+                        order?.let { list.add(it) }
+                    }
+                    foodOrderedLiveData.postValue(list)
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(ContentValues.TAG, "Failed to read order.", error.toException())
+                }
+
+            })
     }
 
     fun updateOrder(orderId: String, orderStatus: String){

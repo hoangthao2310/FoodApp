@@ -47,10 +47,18 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>() {
             }else{
                 loading(true)
                 accountViewModel.register(email, password, userName, false)
-                accountViewModel.getLogStatus.observe(this){
-                    if(it){
+                accountViewModel.getLogStatus.observe(this) {
+                    if (it) {
                         loading(false)
-                        callback.showFragment(SignupFragment::class.java, LoginFragment::class.java, 0,0)
+                        callback.showFragment(
+                            SignupFragment::class.java,
+                            LoginFragment::class.java,
+                            0,
+                            0
+                        )
+                    }else{
+                        loading(false)
+                        binding.edtEmailAdress.error = getString(R.string.email_exist)
                     }
                 }
             }

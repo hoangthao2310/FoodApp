@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.foodapp.model.Cart
 import com.example.foodapp.model.CartAdmin
 import com.example.foodapp.model.Food
+import com.example.foodapp.model.FoodOrdered
 import com.example.foodapp.model.Order
 import com.example.foodapp.repository.CartRepository
 
@@ -15,6 +16,7 @@ class CartViewModel(application: Application): AndroidViewModel(application) {
     private val cartAdminLiveData: MutableLiveData<ArrayList<CartAdmin>>
     private var cartId: MutableLiveData<ArrayList<String>>
     private var orderLiveData: MutableLiveData<ArrayList<Order>>
+    private var foodOrderedLiveData: MutableLiveData<ArrayList<FoodOrdered>>
 
     val getCartFirebase: MutableLiveData<ArrayList<Cart>>
         get() = cartLiveData
@@ -22,12 +24,15 @@ class CartViewModel(application: Application): AndroidViewModel(application) {
         get() = orderLiveData
     val getCartAdmin: MutableLiveData<ArrayList<CartAdmin>>
         get() = cartAdminLiveData
+    val getFoodOrdered: MutableLiveData<ArrayList<FoodOrdered>>
+        get() = foodOrderedLiveData
     init {
         cartRepository = CartRepository(application)
         cartLiveData = cartRepository.getCartFirebase
         cartId = cartRepository.cartId
         orderLiveData = cartRepository.getOrderFirebase
         cartAdminLiveData = cartRepository.getCartAdminFirebase
+        foodOrderedLiveData = cartRepository.getFoodOrdered
     }
     fun addCartAdmin(adminId: String, userName: String, foodName: String){
         cartRepository.addCartAdmin(adminId, userName, foodName)
@@ -47,6 +52,12 @@ class CartViewModel(application: Application): AndroidViewModel(application) {
     }
     fun addOrder(order: Order){
         cartRepository.addOrder(order)
+    }
+    fun addFoodOrdered(foodOrdered: FoodOrdered){
+        cartRepository.addFoodOrdered(foodOrdered)
+    }
+    fun getFoodOrdered(orderId: String){
+        cartRepository.getFoodOrdered(orderId)
     }
     fun getOrder(id: String){
         cartRepository.getOrder(id)

@@ -221,6 +221,20 @@
                     android:textColorHint="@color/red_pink"
                     android:layout_marginStart="12dp"
                     android:layout_marginEnd="12dp"/>
+
+                <TextView
+                    android:id="@+id/btnDelete"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Xóa"
+                    android:layout_marginTop="16dp"
+                    android:textColor="@color/red_pink"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:background="@color/white"
+                    android:gravity="center"
+                    />
+
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

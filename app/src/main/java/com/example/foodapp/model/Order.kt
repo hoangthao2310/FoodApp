@@ -11,5 +11,5 @@ data class Order(
     val describeOrder: String?= null,
     val orderStatus: String?= null,
     val userId: String?= null,
-    val adminId: String?= null
+    val adminId: String?= null,
 )

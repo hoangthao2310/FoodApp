@@ -49,7 +49,6 @@ class FoodFragment : BaseFragment<FragmentFoodBinding>() {
                             cartViewModel.addCartAdmin(food.adminId.toString(), user?.userName.toString(), list.toString())
                         }
                         cartViewModel.addCartDetail(food, 1, food.price!!)
-                        cartViewModel.getCartDetail(food.adminId.toString())
                         notify("Đã thêm vào giỏ hàng")
                     }
 

@@ -95,4 +95,5 @@
     <string name="rating_number">5.0</string>
     <string name="empty_confirm_pass">Không được để trống nhập lại mật khẩu</string>
     <string name="isEmpty">Không được để trống!</string>
+    <string name="email_exist">Địa chỉ email đã tồn tại</string>
 </resources>

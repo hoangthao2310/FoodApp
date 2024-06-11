@@ -72,6 +72,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 binding.edtEmailAdress.error = getString(R.string.valid_email)
             }else if(password.isEmpty()){
                 binding.edtPassword.error = getString(R.string.empty_pass)
+            }else if(password.length < 6){
+                binding.edtPassword.error = getString(R.string.length_pass)
             }else{
                 loading(true)
                 accountViewModel.login(email, password, true)
@@ -89,6 +91,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                                 }
 
                             }
+                        }else{
+                            loading(false)
                         }
                     }
                 }
@@ -96,11 +100,11 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         }
 
         binding.tvSignup.setOnClickListener {
-            callback.showFragment(this::class.java, SignupFragment::class.java, 0, 0)
+            callback.showFragment(this::class.java, SignupFragment::class.java, 0, 0, null, true)
         }
 
         binding.tvForgetPass.setOnClickListener {
-            callback.showFragment(this::class.java, ForgetPassFragment::class.java, 0, 0)
+            callback.showFragment(this::class.java, ForgetPassFragment::class.java, 0, 0, null, true)
         }
     }
     private fun loading(isLoading: Boolean){

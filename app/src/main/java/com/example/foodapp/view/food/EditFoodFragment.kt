@@ -58,11 +58,14 @@ class EditFoodFragment : BaseFragment<FragmentEditFoodBinding>() {
         foodViewModel.getCategory.observe(viewLifecycleOwner) { listCategory ->
             listCategoryName.clear()
             listCategory.forEach { category ->
+                if(categoryId == category.categoryId){
+                    categoryName = category.categoryName
+                }
                 listCategoryName.add(category.categoryName.toString())
             }
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listCategoryName)
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.spinnerCategory.adapter = adapter
+            binding.spinnerCategory.setSelection(listCategoryName.indexOf(categoryName))
             binding.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     categoryName = listCategoryName[position]
@@ -81,16 +84,15 @@ class EditFoodFragment : BaseFragment<FragmentEditFoodBinding>() {
                 bestFood = true
             }
 
-            if(categoryName != ""){
-                foodViewModel.category()
-                foodViewModel.getCategory.observe(viewLifecycleOwner) { listCategory ->
-                    listCategory.forEach { category ->
-                        if (category.categoryName == categoryName) {
-                            categoryId = category.categoryId
-                        }
+            foodViewModel.category()
+            foodViewModel.getCategory.observe(viewLifecycleOwner) { listCategory ->
+                listCategory.forEach { category ->
+                    if (category.categoryName == categoryName) {
+                        categoryId = category.categoryId
                     }
                 }
             }
+
             val newFood = Food(
                 foodName = binding.edtFoodName.text.toString(),
                 price = binding.edtPrice.text.toString().toDouble(),

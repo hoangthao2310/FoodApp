@@ -9,10 +9,12 @@ import com.example.foodapp.adapter.OrderAdapter
 import com.example.foodapp.base.BaseFragment
 import com.example.foodapp.databinding.FragmentOrderBinding
 import com.example.foodapp.model.CartAdmin
+import com.example.foodapp.model.FoodOrdered
 import com.example.foodapp.model.Order
 import com.example.foodapp.view.purchaseOrder.PurchaseOrderFragment
 import com.example.foodapp.viewmodel.AccountViewModel
 import com.example.foodapp.viewmodel.CartViewModel
+import kotlin.random.Random
 
 
 class OrderFragment : BaseFragment<FragmentOrderBinding>() {
@@ -42,7 +44,8 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
         }
 
         binding.btnSelectAddressOrder.setOnClickListener {
-            callback.showFragment(OrderFragment::class.java, LocationOrderFragment::class.java, 0, 0, cartAdmin,true)
+            callback.showFragment(OrderFragment::class.java, LocationOrderFragment::class.java,
+                0, 0, cartAdmin,true)
         }
 
         cartViewModel = ViewModelProvider(this)[CartViewModel::class.java]
@@ -111,7 +114,9 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
                                 describeOrder += cart.foodName + ": Giá: " + cart.price + ", Số lượng: " + cart.quantity + " "
                             }
 
+                            val id = Random.nextInt(10000)
                             val order = Order(
+                                orderId = id.toString(),
                                 userName = binding.tvUserName.text.toString(),
                                 phoneNumber = binding.tvPhoneNumber.text.toString(),
                                 totalPrice = total,
@@ -125,10 +130,17 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
                             )
                             loading()
                             cartViewModel.addOrder(order)
-
                             for(cart in it){
+                                val foodOrdered = FoodOrdered(
+                                    orderId = id.toString(),
+                                    foodName = cart.foodName,
+                                    price = cart.price,
+                                    quantity = cart.quantity
+                                )
+                                cartViewModel.addFoodOrdered(foodOrdered)
                                 cartViewModel.deleteCartDetail(cart.foodId.toString())
                             }
+
                         }
                         cartViewModel.deleteCartAdmin(cartAdmin.cartAdminId.toString())
                         notify("Đặt hàng thành công")

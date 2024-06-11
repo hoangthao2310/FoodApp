@@ -30,7 +30,8 @@ class CartAdminFragment : BaseFragment<FragmentCartAdminBinding>() {
             val onItemClickListener = object : OnItemClickListener{
                 override fun onItemClick(data: Any?) {
                     val cartAdmin = data as CartAdmin
-                    callback.showFragment(CartAdminFragment::class.java, CartFragment::class.java, 0, 0, cartAdmin, true)
+                    callback.showFragment(CartAdminFragment::class.java, CartFragment::class.java,
+                        0, 0, cartAdmin, true)
                 }
 
                 override fun onItemAddClick(data: Any?) {}
@@ -45,7 +46,7 @@ class CartAdminFragment : BaseFragment<FragmentCartAdminBinding>() {
                             cartViewModel.deleteCartDetail(cartId.foodId.toString())
                         }
                     }
-                    cartViewModel.deleteCartAdmin(cartAdmin.adminId.toString())
+                    cartViewModel.deleteCartAdmin(cartAdmin.cartAdminId.toString())
                     val position = cartAdminAdapter.listCartAdmin.indexOf(cartAdmin)
                     cartAdminAdapter.removeItem(position)
                 }

@@ -8,5 +8,6 @@ data class Cart(
     val image: String? = null,
     var intoMoney: Double? = null,
     val adminId: String? = null,
-    val cartAdminId: String? = null
+    val cartAdminId: String? = null,
+    val orderId: String? = null
 )
